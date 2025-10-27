@@ -50,13 +50,26 @@ export const importProductsFromCSV = async (req, res) => {
                     continue;
                 }
 
+                // Prepara as imagens, garantindo que o campo 'image' seja o primeiro item do array
+                let images = [];
+                if (row.image) {
+                    images.push(row.image.trim());
+                }
+                if (row.images) {
+                    // Adiciona as imagens adicionais, removendo duplicatas
+                    const additionalImages = row.images.split(',')
+                        .map(img => img.trim())
+                        .filter(img => img && !images.includes(img));
+                    images = [...images, ...additionalImages];
+                }
+
                 // Cria o produto
                 const product = new Product({
                     name: row.name,
                     price: parseFloat(row.price) || 0,
                     description: row.description,
                     brand: row.brand || "",
-                    images: row.images ? row.images.split(',').map(img => img.trim()) : [],
+                    images: images,
                     category: row.category || "",
                     inStorage: parseInt(row.inStorage) || 0,
                     store: storeId
