@@ -29,7 +29,7 @@ const router = Router();
 router.post('/:storeId/import', upload.single('file'), importProductsFromCSV);
 
 // Upload de imagem
-// POST /api/products/:storeId/upload
+// POST /api/products/upload-image
 router.post('/upload-image', upload.single('image'), uploadImage);
 
 // Cria um novo produto em uma loja
