@@ -9,6 +9,9 @@ const api = Router();
 api.post("/user", createUser);
 api.get("/user/:userId", getUserById);
 
+// Rotas de upload
+api.use('/upload-file', uploadRoutes);
+
 // Rotas de lojas
 api.use('/stores', storeRoutes);
 
