@@ -10,9 +10,19 @@ const __dirname = dirname(__filename);
 // Configuração do Google Drive API
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 
-// Caminho para o arquivo de credenciais
-const CREDENTIALS_PATH = path.join(__dirname, '../credentials.json');
-const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH));
+// Caminho para o arquivo de credenciais na raiz do projeto backend
+const CREDENTIALS_PATH = path.resolve(process.cwd(), 'credentials.json');
+let credentials;
+
+// Carrega as credenciais do arquivo credentials.json
+console.log('Caminho para o arquivo de credenciais:', CREDENTIALS_PATH);
+
+try {
+    credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+} catch (error) {
+    console.error('Erro ao carregar o arquivo credentials.json:', error.message);
+    throw new Error('Arquivo credentials.json não encontrado ou inválido na raiz do projeto backend');
+}
 
 // Configura o cliente OAuth2
 const auth = new google.auth.OAuth2(
