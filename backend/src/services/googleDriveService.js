@@ -24,12 +24,11 @@ try {
     throw new Error('Arquivo credentials.json não encontrado ou inválido na raiz do projeto backend');
 }
 
-// Configura o cliente OAuth2
-const auth = new google.auth.OAuth2(
-    credentials.client_id,
-    credentials.client_secret,
-    process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/oauth2callback'
-);
+// Configura a autenticação com Google Auth usando conta de serviço
+const auth = new google.auth.GoogleAuth({
+    credentials: credentials,
+    scopes: ['https://www.googleapis.com/auth/drive.file']
+});
 
 // Configura o serviço do Google Drive
 const drive = google.drive({ version: 'v3', auth });
