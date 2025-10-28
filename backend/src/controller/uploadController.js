@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Caminho para o arquivo de credenciais
-const CREDENTIALS_PATH = path.resolve(__dirname, '../../../credentials.json');
+const CREDENTIALS_PATH = path.resolve(__dirname, '../../credentials.json');
 
 // Carrega as credenciais do arquivo
 let credentials;
