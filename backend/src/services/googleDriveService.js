@@ -18,23 +18,49 @@ const driveService = google.drive({ version: 'v3', auth });
 
 // === FUNÇÃO PARA FAZER UPLOAD ===
 async function uploadToDrive(filePath, fileName, folderId, mimeType) {
-  const fileMetadata = {
-    name: fileName,
-    parents: [folderId],
-  };
+  try {
+    const fileMetadata = {
+      name: fileName,
+      parents: [folderId],
+    };
 
-  const media = {
-    mimeType: mimeType,
-    body: fs.createReadStream(filePath),
-  };
+    const media = {
+      mimeType: mimeType,
+      body: fs.createReadStream(filePath),
+    };
 
-  const response = await driveService.files.create({
-    requestBody: fileMetadata,
-    media: media,
-    fields: 'id, webViewLink, webContentLink',
-  });
+    // Upload the file to the shared drive
+    const response = await driveService.files.create({
+      resource: fileMetadata,
+      media: media,
+      supportsAllDrives: true,  // Important for shared drives
+      fields: 'id, name, webViewLink, webContentLink, webContentLink, thumbnailLink',
+    });
 
-  return response.data;
+    const fileId = response.data.id;
+
+    // Set the file to be publicly accessible
+    await driveService.permissions.create({
+      fileId: fileId,
+      requestBody: {
+        role: 'reader',
+        type: 'anyone',
+      },
+      supportsAllDrives: true,
+    });
+
+    // Get the file with updated permissions
+    const file = await driveService.files.get({
+      fileId: fileId,
+      fields: 'id, name, webViewLink, webContentLink, thumbnailLink',
+      supportsAllDrives: true,
+    });
+
+    return file.data;
+  } catch (error) {
+    console.error('Error in uploadToDrive:', error);
+    throw error;
+  }
 }
 
 // === CONTROLLER EXPRESS ===
