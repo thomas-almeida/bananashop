@@ -1,12 +1,11 @@
+// routes/uploadRoutes.js
 import express from 'express';
-import multer from 'multer';
-import { uploadToDrive } from '../controller/uploadController.js';
+import { upload, uploadImage } from '../controller/uploadController.js';
 
 const router = express.Router();
 
-// usa o multer para lidar com o upload
-const upload = multer({ dest: 'uploads/' });
+// Rota para upload de imagem
 
-router.post('/upload', upload.single('file'), uploadToDrive);
+router.post('/upload', upload.single('image'), uploadImage);
 
 export default router;
