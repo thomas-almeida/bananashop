@@ -6,6 +6,7 @@ import {
     deleteProduct
 } from '../controller/productController.js';
 import { importProductsFromCSV } from '../controller/importController.js';
+import { uploadToDrive } from '../controller/uploadController.js';
 import { uploadImage } from '../services/googleDriveService.js';
 import multer from 'multer';
 import path from 'path';
@@ -27,6 +28,9 @@ const router = Router();
 // Importa produtos via CSV
 // POST /api/products/:storeId/import
 router.post('/:storeId/import', upload.single('file'), importProductsFromCSV);
+
+// POST /api/products/upload-file
+router.post('/upload-file', upload.single('file'), uploadToDrive);
 
 // Upload de imagem
 // POST /api/products/upload-image
