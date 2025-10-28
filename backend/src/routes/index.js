@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createUser, getUserById } from "../controller/userController.js";
 import storeRoutes from "./storeRoutes.js";
 import productRoutes from "./productRoutes.js";
+import uploadRoutes from "./uploadRoutes.js";
 
 const api = Router();
 
