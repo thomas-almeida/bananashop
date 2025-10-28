@@ -4,6 +4,7 @@ const StoreSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
     igNickname: { type: String, required: true },
+    whatsapppNumber: { type: String, required: true },
     image: { type: String, default: "" },
     publicLink: { type: String, default: "" },
     views: { type: Number, default: 0 },

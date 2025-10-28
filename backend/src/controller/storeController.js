@@ -4,7 +4,7 @@ import User from "../db/models/User.js";
 export const createStore = async (req, res) => {
     try {
         const { userId } = req.params;
-        const { name, description, igNickname, image } = req.body;
+        const { name, description, igNickname, image, whatsappNumber } = req.body;
 
         // Verifica se o usuário existe
         const user = await User.findById(userId);
@@ -23,6 +23,7 @@ export const createStore = async (req, res) => {
             description,
             igNickname,
             image: image || "",
+            whatsappNumber,
             owner: userId,
             publicLink: `${process.env.PUBLIC_BASEURL}/loja/${name.toLowerCase().replace(/\s/g, '-')}`
         });
