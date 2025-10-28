@@ -13,7 +13,7 @@ const TOKEN = {
 };
 
 // substitua pelo caminho do seu credentials.json (do Google Cloud)
-const CREDENTIALS = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+const CREDENTIALS = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
 
 // autenticação OAuth2
 const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
