@@ -30,40 +30,32 @@ const drive = google.drive({ version: "v3", auth: oauth2Client });
 
 export async function uploadToDrive(req, res) {
   try {
-    const { file } = req;
-
-    if (!file) {
+    if (!req.file) {
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
     }
 
-    const filePath = path.resolve(file.path);
+    const buffer = req.file.buffer; // o multer deve estar em modo memoryStorage
 
-    // 📤 Envia o arquivo para o Drive
     const response = drive.files.create({
       requestBody: {
-        name: file.originalname,
-        mimeType: file.mimetype,
-        parents: [process.env.GOOGLE_DRIVE_FOLDER_ID], // opcional: pasta de destino
+        name: req.file.originalname,
+        mimeType: req.file.mimetype,
+        parents: [process.env.GOOGLE_DRIVE_FOLDER_ID],
       },
       media: {
-        mimeType: file.mimetype,
-        body: fs.createReadStream(filePath),
+        mimeType: req.file.mimetype,
+        body: Buffer.from(buffer),
       },
       fields: "id, name, webViewLink, webContentLink",
     });
 
-    // 🧹 Remove o arquivo local após upload
-    fs.unlinkSync(filePath);
-
-    return res.json({
+    res.json({
       success: true,
       file: response.data,
     });
   } catch (error) {
-    console.error("Erro ao enviar para o Google Drive:", error.message);
-    return res.status(500).json({
-      error: "Falha ao enviar arquivo para o Google Drive",
-      details: error.message,
-    });
+    console.error("Erro no upload para o Drive:", error);
+    res.status(500).json({ error: "Erro ao enviar arquivo", details: error.message });
   }
 };
+
