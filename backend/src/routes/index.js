@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { createUser, getUserById } from "../controller/userController.js";
+import { upload, uploadImage } from "../controller/uploadController.js";
 import storeRoutes from "./storeRoutes.js";
 import productRoutes from "./productRoutes.js";
-import uploadRoutes from "./uploadRoutes.js";
 
 const api = Router();
 
@@ -17,7 +17,6 @@ api.use('/stores', storeRoutes);
 api.use('/products', productRoutes);
 
 // Rotas de upload
-api.use('/upload-image', uploadRoutes);
-
+api.post('/upload-image', upload.single('image'), uploadImage);
 
 export default api;
