@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadToDrive } from '../controllers/uploadController.js';
+import { uploadToDrive } from '../controller/uploadController.js';
 
 const router = express.Router();
 
