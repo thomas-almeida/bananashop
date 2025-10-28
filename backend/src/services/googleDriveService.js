@@ -26,8 +26,8 @@ try {
 
 // Configura o cliente OAuth2
 const auth = new google.auth.OAuth2(
-    credentials.web.client_id,
-    credentials.web.client_secret,
+    credentials.client_id,
+    credentials.client_secret,
     process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/oauth2callback'
 );
 
