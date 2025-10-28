@@ -39,7 +39,7 @@ const drive = google.drive({ version: 'v3', auth });
  * @param {string} folderId - ID da pasta no Google Drive (opcional)
  * @returns {Promise<string>} - URL pública do arquivo
  */
-export const uploadFile = async (file, folderId = "1c2uGUjwQ3Q5Qv_K8Yf5Z_6-bLnTdfL_L") => {
+export const uploadFile = async (file, folderId = "14Hr2xNU2MRZLhW3xHVuzj37VMrQN5w3n") => {
     try {
         // Define as permissões do arquivo
         const fileMetadata = {
@@ -57,7 +57,8 @@ export const uploadFile = async (file, folderId = "1c2uGUjwQ3Q5Qv_K8Yf5Z_6-bLnTd
         const response = await drive.files.create({
             resource: fileMetadata,
             media: media,
-            fields: 'id,webViewLink,webContentLink'
+            fields: 'id,webViewLink,webContentLink',
+            supportsAllDrives: true
         });
 
         // Configura as permissões para público
@@ -65,8 +66,9 @@ export const uploadFile = async (file, folderId = "1c2uGUjwQ3Q5Qv_K8Yf5Z_6-bLnTd
             fileId: response.data.id,
             requestBody: {
                 role: 'reader',
-                type: 'anyone'
-            }
+                type: 'anyone',
+            },
+            supportsAllDrives: true
         });
 
         // Obtém a URL pública do arquivo
@@ -74,7 +76,8 @@ export const uploadFile = async (file, folderId = "1c2uGUjwQ3Q5Qv_K8Yf5Z_6-bLnTd
         const result = await drive.files.get({
             fileId: fileId,
             fields: 'webViewLink,webContentLink,thumbnailLink'
-        });
+        }, {
+            supportsAllDrives: true });
 
         // Remove o arquivo temporário
         fs.unlinkSync(file.path);
@@ -98,7 +101,8 @@ export const uploadFile = async (file, folderId = "1c2uGUjwQ3Q5Qv_K8Yf5Z_6-bLnTd
 export const deleteFile = async (fileId) => {
     try {
         await drive.files.delete({
-            fileId: fileId
+            fileId: fileId,
+            supportsAllDrives: true
         });
     } catch (error) {
         console.error('Error deleting file from Google Drive:', error);
