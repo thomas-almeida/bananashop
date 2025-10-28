@@ -1,6 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { google } from 'googleapis';
+
+// Get the directory name in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // === CONFIGURAÇÃO DO GOOGLE DRIVE ===
 const auth = new google.auth.GoogleAuth({
@@ -11,14 +17,14 @@ const auth = new google.auth.GoogleAuth({
 const driveService = google.drive({ version: 'v3', auth });
 
 // === FUNÇÃO PARA FAZER UPLOAD ===
-async function uploadToDrive(filePath, fileName, folderId) {
+async function uploadToDrive(filePath, fileName, folderId, mimeType) {
   const fileMetadata = {
     name: fileName,
     parents: [folderId],
   };
 
   const media = {
-    mimeType: req.file.mimetype, // usa o mimetype do arquivo enviado
+    mimeType: mimeType,
     body: fs.createReadStream(filePath),
   };
 
@@ -40,7 +46,7 @@ export const uploadImage = async (req, res) => {
     const filePath = req.file.path;
     const fileName = req.file.originalname;
 
-    const fileData = await uploadToDrive(filePath, fileName, folderId);
+    const fileData = await uploadToDrive(filePath, fileName, folderId, req.file.mimetype);
 
     // remove o arquivo local depois do upload
     fs.unlinkSync(filePath);
