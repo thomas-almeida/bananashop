@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { 
-    createProduct, 
-    getProductsByStore, 
-    updateProduct, 
-    deleteProduct 
+import {
+    createProduct,
+    getProductsByStore,
+    updateProduct,
+    deleteProduct
 } from '../controller/productController.js';
 import { importProductsFromCSV } from '../controller/importController.js';
+import { uploadImage } from '../services/googleDriveService.js';
 import multer from 'multer';
 import path from 'path';
 
@@ -26,6 +27,10 @@ const router = Router();
 // Importa produtos via CSV
 // POST /api/products/:storeId/import
 router.post('/:storeId/import', upload.single('file'), importProductsFromCSV);
+
+// Upload de imagem
+// POST /api/products/:storeId/upload
+router.post('/upload-image', upload.single('image'), uploadImage);
 
 // Cria um novo produto em uma loja
 // POST /api/products/:storeId/create
