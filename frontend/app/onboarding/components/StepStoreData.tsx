@@ -128,6 +128,7 @@ export default function StepStoreData() {
         errors={errors.storeName}
         type="text"
         label="Nome da loja"
+        className={errors.storeName ? "border-red-500" : ""}
         icon={<ShoppingBag size={20} />}
       />
 
@@ -137,6 +138,7 @@ export default function StepStoreData() {
         errors={errors.description}
         type="text"
         label="Descrição da loja"
+        className={errors.description ? "border-red-500" : ""}
       />
 
       <Input
@@ -145,6 +147,7 @@ export default function StepStoreData() {
         errors={errors.instagram}
         type="text"
         label="Instagram da Loja"
+        className={errors.instagram ? "border-red-500" : ""}
         icon={<Instagram size={20} />}
       />
 
@@ -154,6 +157,7 @@ export default function StepStoreData() {
         errors={errors.whatsapp}
         type="text"
         label="Whatsapp do responsável"
+        className={errors.whatsapp ? "border-red-500" : ""}
         icon={<MessageCircle size={20} />}
       />
 

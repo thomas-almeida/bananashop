@@ -109,6 +109,7 @@ export default function StepBanking() {
                     type="text"
                     label="CPF"
                     icon={<User size={20} />}
+                    className={errors.taxID ? "border-red-500" : ""}
                 />
             </div>
 
@@ -120,6 +121,7 @@ export default function StepBanking() {
                     type="text"
                     label="Chave Pix"
                     icon={<Landmark size={20} />}
+                    className={errors.pixKey ? "border-red-500" : ""}
                 />
             </div>
 
