@@ -42,3 +42,33 @@ export async function getUserById(req, res) {
     }
 }
 
+export async function updateUser(req, res) {
+    try {
+        const { userId } = req.params;
+        const updates = req.body;
+        const allowedUpdates = ['taxID', 'pixKey', 'rate'];
+
+        const updatesToApply = {};
+        Object.keys(updates).forEach(key => {
+            if (allowedUpdates.includes(key)) {
+                updatesToApply[key] = updates[key];
+            }
+        });
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updatesToApply, { new: true });
+
+        return res.status(200).json({ message: "User updated successfully", user: updatedUser });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return res.status(500).json({
+            message: "Error updating user",
+            error: error.message
+        });
+    }
+}
