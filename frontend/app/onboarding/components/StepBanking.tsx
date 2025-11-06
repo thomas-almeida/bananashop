@@ -18,6 +18,7 @@ type BankingForm = z.infer<typeof bankingSchema>
 
 export default function StepBanking() {
     const { banking, setBanking } = useOnboardingStore()
+    const [fetching, setFetching] = useState<boolean>(false)
     const [valorVenda, setValorVenda] = useState<number>(1000)
     const [selected, setSelected] = useState<"IMEDIATO" | "SEMANAL" | "MENSAL" | null>(
         banking.rate as "IMEDIATO" | "SEMANAL" | "MENSAL" | null
@@ -60,25 +61,35 @@ export default function StepBanking() {
 
     const onSubmit = async (values: BankingForm) => {
 
-        // Mapeia o payoutMethod para o rate que a store espera
-        const rate = values.payoutMethod === "IMEDIATO" ? 0.050 : values.payoutMethod === "SEMANAL" ? 0.025 : 0.015
+        setFetching(true)
+        try {
 
-        if (!session?.user?.id) {
-            console.error('No user session found');
-            return;
+            // Mapeia o payoutMethod para o rate que a store espera
+            const rate = values.payoutMethod === "IMEDIATO" ? 0.050 : values.payoutMethod === "SEMANAL" ? 0.025 : 0.015
+
+            if (!session?.user?.id) {
+                console.error('No user session found');
+                return;
+            }
+
+            await updateUser(session.user.id, {
+                pixKey: values.pixKey,
+                taxId: values.taxID,
+                rate
+            })
+
+            setBanking({
+                ...values,
+                rate: values.payoutMethod
+            })
+
+        } catch (error) {
+            console.error('Failed to update user:', error);
+            setFetching(false)
         }
 
-        await updateUser(session.user.id, {
-            pixKey: values.pixKey,
-            taxId: values.taxID,
-            rate
-        })
-
-        setBanking({
-            ...values,
-            rate: values.payoutMethod
-        })
         redirect("/dashboard")
+
     }
 
     return (
@@ -167,9 +178,10 @@ export default function StepBanking() {
 
             <Button
                 type="submit"
-                text="Finalizar Cadastro"
+                text={fetching ? "Finalizando..." : "Finalizar Cadastro"}
                 color="primary"
                 disabled={selected === null}
+                loading={fetching}
             />
         </form>
     )

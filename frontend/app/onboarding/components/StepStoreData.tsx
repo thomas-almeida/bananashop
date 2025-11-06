@@ -10,7 +10,7 @@ import { useDropzone } from "react-dropzone";
 import Input from "../../components/form/Input";
 import Button from "../../components/form/Button";
 import { FileImage, ShoppingBag, Instagram, MessageCircle } from "lucide-react";
-
+import { useState } from "react";
 //services
 import { createStore, updateStore } from "@/app/service/storeService";
 import { uploadImage } from "@/app/service/uploadService";
@@ -19,6 +19,7 @@ type StoreFormData = z.infer<typeof storeSchema>;
 
 export default function StepStoreData() {
   const { store, setStore, setStep } = useOnboardingStore();
+  const [fetching, setFetching] = useState<boolean>(false)
   const {
     register,
     handleSubmit,
@@ -58,6 +59,9 @@ export default function StepStoreData() {
   const { data: session } = useSession();
 
   const onSubmit = async (data: StoreFormData) => {
+
+    setFetching(true)
+
     if (!session?.user?.id) {
       console.error('No user session found');
       return;
@@ -103,6 +107,7 @@ export default function StepStoreData() {
       setStep(2);
     } catch (error) {
       console.error('Failed to create store:', error);
+      setFetching(false)
       // Handle error (e.g., show error message to user)
     }
   };
@@ -176,8 +181,9 @@ export default function StepStoreData() {
 
       <Button
         type="submit"
-        text="Continuar"
+        text={fetching ? "Aguarde..." : "Continuar"}
         color="primary"
+        loading={fetching}
       />
 
     </form>
