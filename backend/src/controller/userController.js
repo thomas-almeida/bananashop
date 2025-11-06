@@ -1,11 +1,17 @@
 import User from "../db/models/User.js";
 
-export function createUser(req, res) {
+export async function createUser(req, res) {
     try {
         const { username, email } = req.body;
 
         if (!username || !email) {
             return res.status(400).json({ message: "Username and email are required" });
+        }
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(201).json({ user: existingUser });
         }
 
         const user = new User({ username, email });
