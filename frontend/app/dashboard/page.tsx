@@ -12,7 +12,8 @@ export default function Dashboard() {
     return (
         <>
             <div className="px-4">
-                <h1 className="text-2xl font-semibold">Olá {session?.user?.name}</h1>
+                <h1 className="text-2xl font-semibold">Olá,{session?.user?.name}</h1>
+                <p className="text-sm text-gray-500">Bora vender!</p>
 
                 <div className="flex justify-start items-center gap-2 p-2 rounded-md my-5 mb-10 border border-gray-200 shadow-md">
                     <Image
@@ -27,7 +28,7 @@ export default function Dashboard() {
                         <h2 className="text-xl font-semibold">Store Name</h2>
                         <Link
                             className="w-full text-sm text-blue-400 font-medium"
-                            href={"/dashboard"}
+                            href={"/store/bananashop"}
                         >
                             Ver minha loja
                         </Link>
@@ -35,20 +36,34 @@ export default function Dashboard() {
                 </div>
 
                 <div className="my-4">
-                    <h2 className="text-xl font-semibold">Dashboard</h2>
-                    <div className="grid grid-cols-2 gap-2 my-4">
-                        {
-                            pageTree.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    className="flexjustify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
-                                >
-                                    <item.icon />
-                                    {item.name}
-                                </Link>
-                            ))
-                        }
+                    <h2 className="text-xl font-semibold my-4">Dashboard</h2>
+                    <div>
+                        <div
+                            className="flex justify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
+                        >
+                            <div>
+                                <p className="text-md text-gray-500">Saldo em vendas</p>
+                                <h3 className="text-3xl font-semibold">R$00,00</h3>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 my-4">
+                            <div
+                                className="flexjustify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
+                            >
+
+                                <h2 className="text-3xl py-1 font-semibold">20</h2>
+                                <h3 className="text-xl font-semibold">R$00,00</h3>
+                                <p className="text-md text-gray-500">Vendas Aprovadas</p>
+                            </div>
+                            <div
+                                className="flexjustify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
+                            >
+
+                                <h2 className="text-3xl py-1 font-semibold">10</h2>
+                                <h3 className="text-xl font-semibold">R$00,00</h3>
+                                <p className="text-md text-gray-500">Vendas Pendentes</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
