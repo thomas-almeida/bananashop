@@ -45,15 +45,7 @@ export async function getUserById(req, res) {
 export async function updateUser(req, res) {
     try {
         const { userId } = req.params;
-        const updates = req.body;
-        const allowedUpdates = ['taxID', 'pixKey', 'rate'];
-
-        const updatesToApply = {};
-        Object.keys(updates).forEach(key => {
-            if (allowedUpdates.includes(key)) {
-                updatesToApply[key] = updates[key];
-            }
-        });
+        const { pixKey, taxId, rate } = req.body;
 
         const user = await User.findById(userId);
 
@@ -61,13 +53,27 @@ export async function updateUser(req, res) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(userId, updatesToApply, { new: true });
+        // Update only the provided banking fields
+        const updateData = {};
 
-        return res.status(200).json({ message: "User updated successfully", user: updatedUser });
+        if (pixKey !== undefined) updateData['banking.pixKey'] = pixKey;
+        if (taxId !== undefined) updateData['banking.taxId'] = taxId;
+        if (rate !== undefined) updateData['banking.rate'] = rate;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            message: "User banking information updated successfully",
+            user: updatedUser
+        });
     } catch (error) {
-        console.error("Error updating user:", error);
+        console.error("Error updating user banking information:", error);
         return res.status(500).json({
-            message: "Error updating user",
+            message: "Error updating user banking information",
             error: error.message
         });
     }
