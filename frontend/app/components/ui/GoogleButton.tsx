@@ -1,20 +1,13 @@
 "use client"
 
 import { GoogleIcon } from "./GoogleIcon";
-import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 interface GoogleButtonProps {
     text: string
 }
 
 export function GoogleButton({ text }: GoogleButtonProps) {
-
-    const { data: session } = useSession()
-
-    if (session) {
-        redirect("/")
-    }
 
     return (
         <button

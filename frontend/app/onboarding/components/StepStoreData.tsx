@@ -1,6 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
 import { storeSchema } from "../schemas/onboardingSchema";
 import { useOnboardingStore } from "../store/useOnboardingStore";
 import { z } from "zod";
@@ -9,6 +10,10 @@ import { useDropzone } from "react-dropzone";
 import Input from "../../components/form/Input";
 import Button from "../../components/form/Button";
 import { FileImage, ShoppingBag, Instagram, MessageCircle } from "lucide-react";
+
+//services
+import { createStore, updateStore } from "@/app/service/storeService";
+import { uploadImage } from "@/app/service/uploadService";
 
 type StoreFormData = z.infer<typeof storeSchema>;
 
@@ -50,9 +55,56 @@ export default function StepStoreData() {
     multiple: false,
   });
 
-  const onSubmit = (data: StoreFormData) => {
-    setStore(data);
-    setStep(2);
+  const { data: session } = useSession();
+
+  const onSubmit = async (data: StoreFormData) => {
+    if (!session?.user?.id) {
+      console.error('No user session found');
+      return;
+    }
+
+    try {
+      let imageUrl = '';
+
+      if (logo) {
+        // Se o logo for uma string base64, converter para File
+        let fileToUpload: File;
+
+        if (typeof logo === 'string' && logo.startsWith('data:image')) {
+          const response = await fetch(logo);
+          const blob = await response.blob();
+          fileToUpload = new File([blob], 'store-logo.jpg', { type: 'image/jpeg' });
+        } else if (logo instanceof File) {
+          fileToUpload = logo;
+        } else {
+          throw new Error('Formato de imagem não suportado');
+        }
+
+        const uploadResponse = await uploadImage(fileToUpload);
+        imageUrl = uploadResponse.imageUrl;
+      }
+
+      // Criar a loja com os dados e a URL da imagem
+      await createStore(session.user.id, {
+        name: data.storeName,
+        description: data.description,
+        igNickname: data.instagram,
+        whatsappNumber: data.whatsapp,
+        image: imageUrl
+      });
+
+      // Atualizar o estado local
+      setStore({
+        ...data,
+        logo: imageUrl || data.logo
+      });
+
+      // Ir para o próximo passo
+      setStep(2);
+    } catch (error) {
+      console.error('Failed to create store:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   return (

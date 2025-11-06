@@ -8,6 +8,9 @@ import { bankingSchema } from "../schemas/onboardingSchema"
 import { User, DollarSign, Landmark } from "lucide-react"
 import { redirect } from "next/navigation"
 
+import { useSession } from "next-auth/react"
+import { updateUser } from "@/app/service/userService"
+
 import Input from "../../components/form/Input"
 import Button from "../../components/form/Button"
 
@@ -19,6 +22,8 @@ export default function StepBanking() {
     const [selected, setSelected] = useState<"IMEDIATO" | "SEMANAL" | "MENSAL" | null>(
         banking.rate as "IMEDIATO" | "SEMANAL" | "MENSAL" | null
     )
+
+    const { data: session } = useSession()
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<BankingForm>({
         resolver: zodResolver(bankingSchema),
@@ -53,8 +58,22 @@ export default function StepBanking() {
         })
     }
 
-    const onSubmit = (values: BankingForm) => {
+    const onSubmit = async (values: BankingForm) => {
+
         // Mapeia o payoutMethod para o rate que a store espera
+        const rate = values.payoutMethod === "IMEDIATO" ? 0.050 : values.payoutMethod === "SEMANAL" ? 0.025 : 0.015
+
+        if (!session?.user?.id) {
+            console.error('No user session found');
+            return;
+        }
+
+        await updateUser(session.user.id, {
+            pixKey: values.pixKey,
+            taxId: values.taxID,
+            rate
+        })
+
         setBanking({
             ...values,
             rate: values.payoutMethod
