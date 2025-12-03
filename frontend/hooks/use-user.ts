@@ -22,22 +22,31 @@ export function useUser() {
     const [loading, setLoading] = useState(true);
     const { data: session } = useSession();
 
-    const userStorage = localStorage.getItem("userStore");
-    console.log(userStorage)
-
     useEffect(() => {
         async function fetchUser() {
             const userId = session?.user?.id;
+            const userStorage = localStorage.getItem("userStore");
+
             if (!userId) {
                 setLoading(false);
                 return;
             }
 
             try {
+
+                if (userStorage !== null) {
+                    const parsedUser = JSON.parse(userStorage);
+                    setUser(parsedUser);
+                    setLoading(false);
+                    return;
+                }
+
                 const userData = await getUser(userId);
+                localStorage.setItem("userStore", JSON.stringify(userData));
                 setUser(userData);
             } catch (error) {
                 console.error('Error fetching user:', error);
+                setLoading(false);
             } finally {
                 setLoading(false);
             }
