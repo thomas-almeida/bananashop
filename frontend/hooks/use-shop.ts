@@ -25,7 +25,7 @@ export function useShop(storeId?: string) {
     useEffect(() => {
         async function fetchStore() {
             const userId = session?.user.id
-
+            
             if (!userId) {
                 setLoading(false)
                 return
