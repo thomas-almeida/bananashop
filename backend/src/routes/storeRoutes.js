@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createStore, getStoreByUserId, updateStore} from '../controller/storeController.js';
+import { createStore, getStoreByUserId, updateStore, getStoreByName } from '../controller/storeController.js';
 
 const router = Router();
 
@@ -10,9 +10,14 @@ router.post('/:userId/create', createStore);
 // Obtém a loja de um usuário específico
 // GET /api/stores/user/:userId
 router.get('/:userId', getStoreByUserId);
+router.get('/name/:storeName', getStoreByName);
 
 // Atualiza uma loja
 // PUT /api/stores/:storeId
 router.put('/:storeId/update', updateStore);
+
+// Busca uma loja pelo nome
+// GET /api/stores/name/:storeName
+router.get('/name/:storeName', getStoreByName);
 
 export default router;

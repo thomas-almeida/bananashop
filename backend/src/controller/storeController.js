@@ -71,6 +71,44 @@ export const getStoreByUserId = async (req, res) => {
     }
 };
 
+export const getStoreByName = async (req, res) => {
+    try {
+        const { storeName } = req.params;
+
+        const store = await Store.findOne({ 
+            name: storeName
+        })
+        .populate('products', 'name price images')
+        .populate('owner', 'username email')
+        .lean();
+
+        if (!store) {
+            return res.status(404).json({ 
+                success: false,
+                message: "Loja não encontrada" 
+            });
+        }
+
+        // Incrementa o contador de visualizações
+        await Store.findByIdAndUpdate(store._id, { 
+            $inc: { views: 1 } 
+        });
+        store.views += 1; // Atualiza o objeto local para refletir o incremento
+
+        return res.status(200).json({
+            success: true,
+            data: store
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar loja:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Erro ao buscar loja",
+            error: error.message
+        });
+    }
+};
 
 export const updateStore = async (req, res) => {
     try {
