@@ -15,12 +15,13 @@ export default function Button({ children, icon, text, onClick, className, color
         <button
             style={{
                 backgroundColor: color === "primary" ? "#22C55E" : "#FFFFFF",
-                color: color === "primary" ? "#FFFFFF" : "#000000"
+                color: color === "primary" ? "#FFFFFF" : "#000000",
+                cursor: disabled ? "not-allowed" : "pointer"
             }}
             onClick={onClick}
             disabled={disabled}
             type={type}
-            className={`w-full py-4 text-lg font-semibold shadow-sm rounded-md flex items-center justify-center ${color == "secondary" ? "border border-gray-300" : ""} ${className}`}
+            className={`w-full py-4 cursor-pointer text-lg font-semibold shadow-sm rounded-md flex items-center justify-center ${color == "secondary" ? "border border-gray-300" : ""} ${className}`}
         >
             {
                 icon &&

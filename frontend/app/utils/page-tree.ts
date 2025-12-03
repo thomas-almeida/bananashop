@@ -8,11 +8,6 @@ export const pageTree = [
         icon: ShoppingBag,
     },
     {
-        name: "Finanças",
-        href: "/dashboard/finance",
-        icon: DollarSign,
-    },
-    {
         name: "Ajustes",
         href: "/dashboard/settings",
         icon: Settings,

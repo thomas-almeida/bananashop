@@ -5,9 +5,20 @@ import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 import { pageTree } from "@/app/utils/page-tree"
+import { useUser } from "@/hooks/use-user"
+import { useShop } from "@/hooks/use-shop"
+import Button from "../components/form/Button"
 
 export default function Dashboard() {
     const { data: session } = useSession()
+    const { user, loading } = useUser()
+    const { store, loading: shopLoading } = useShop()
+
+    if (loading || shopLoading) {
+        return <div>Loading...</div>;
+    }
+
+    console.log("Store:", store);
 
     return (
         <>
@@ -17,7 +28,7 @@ export default function Dashboard() {
 
                 <div className="flex justify-start items-center gap-2 p-2 rounded-md my-5 mb-10 border border-gray-200 shadow-md">
                     <Image
-                        src={session?.user?.image || "/avatar.png"}
+                        src={store?.image || "/logo.png"}
                         alt="Avatar"
                         width={55}
                         height={55}
@@ -25,10 +36,12 @@ export default function Dashboard() {
                     />
 
                     <div className="px-2">
-                        <h2 className="text-xl font-semibold">Store Name</h2>
+                        <h2 className="text-xl font-semibold">
+                            {store?.name}
+                        </h2>
                         <Link
                             className="w-full text-sm text-blue-400 font-medium"
-                            href={"/store/bananashop"}
+                            href={`/loja/${store?.name}`}
                         >
                             Ver minha loja
                         </Link>
@@ -39,29 +52,20 @@ export default function Dashboard() {
                     <h2 className="text-xl font-semibold my-4">Dashboard</h2>
                     <div>
                         <div
-                            className="flex justify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
+                            className="flex justify-start items-end gap-2 p-4 rounded-md border border-gray-300 shadow-md"
                         >
-                            <div>
+                            <div className="w-full py-2 flex flex-col gap-4">
                                 <p className="text-md text-gray-500">Saldo em vendas</p>
-                                <h3 className="text-3xl font-semibold">R$00,00</h3>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 my-4">
-                            <div
-                                className="flexjustify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
-                            >
-
-                                <h2 className="text-3xl py-1 font-semibold">20</h2>
-                                <h3 className="text-xl font-semibold">R$00,00</h3>
-                                <p className="text-md text-gray-500">Vendas Aprovadas</p>
-                            </div>
-                            <div
-                                className="flexjustify-start items-end gap-2 p-4 h-32 rounded-md border border-gray-300 shadow-md"
-                            >
-
-                                <h2 className="text-3xl py-1 font-semibold">10</h2>
-                                <h3 className="text-xl font-semibold">R$00,00</h3>
-                                <p className="text-md text-gray-500">Vendas Pendentes</p>
+                                <h3 className="text-4xl font-semibold">
+                                    {user?.banking.balance.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                </h3>
+                                <Button
+                                    text="Solicitar Saque"
+                                    color="primary"
+                                    className={`w-full ${!user || user.banking.balance < 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={!user || user.banking.balance < 10}
+                                    onClick={() => console.log("Solicitar saque")}
+                                />
                             </div>
                         </div>
                     </div>
@@ -69,7 +73,7 @@ export default function Dashboard() {
 
                 <div>
                     <h2 className="text-xl font-semibold">Menu</h2>
-                    <div className="grid grid-cols-2 gap-2 my-4">
+                    <div className="grid grid-cols-1 gap-2 my-4">
                         {
                             pageTree.map((item) => (
                                 <Link

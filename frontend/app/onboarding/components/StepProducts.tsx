@@ -22,15 +22,6 @@ export default function StepProducts() {
                 onClick={handleManual}
                 className="w-full h-48 border border-gray-300 shadow-md p-3 rounded-lg text-left hover:bg-gray-100 flex flex-col justify-end cursor-pointer"
             >
-                <PackagePlus className="w-12 h-12" />
-                <h3 className="font-semibold text-xl">Criar Manualmente</h3>
-                <p className="text-sm text-gray-500">Adicione um a um com Nome, Preço, Descrição dentre outros dados para começar a vender</p>
-            </div>
-
-            <div
-                onClick={handleManual}
-                className="w-full h-48 border border-gray-300 shadow-md p-3 rounded-lg text-left hover:bg-gray-100 flex flex-col justify-end cursor-pointer"
-            >
                 <FileSpreadsheet className="w-12 h-12" />
                 <div className="flex items-center justify-start gap-3 my-2">
                     <h3 className="font-semibold text-xl">Importar CSV</h3>
@@ -41,11 +32,15 @@ export default function StepProducts() {
 
             <h2 className="text-lg font-semibold flex justify-center">Ou</h2>
 
-            <Button
+            <div
                 onClick={() => setStep(3)}
-                text="Fazer isso depois"
-                color="secondary"
-            />
+                className="w-full h-30 border border-gray-300 shadow-md p-3 rounded-lg text-left hover:bg-gray-100 flex flex-col justify-end cursor-pointer"
+            >
+                <div className="flex items-center justify-start gap-3 my-2">
+                    <h3 className="font-semibold text-xl">Fazer isso depois</h3>
+                </div>
+                <p className="text-sm text-gray-500">Você pode adicionar manualmente depois e importar o CSV mais tarde</p>
+            </div>
         </div>
     );
 }

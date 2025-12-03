@@ -29,3 +29,23 @@ export const updateStore = async (userId: string, storeData: any) => {
         throw error;
     }
 };
+
+export const getStoreByUserId = async (userId: string) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/stores/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting store:', error);
+        throw error;
+    }
+};
+
+export const getStoreByName = async (storeName: string) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/stores/name/${storeName}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting store:', error);
+        throw error;
+    }
+};

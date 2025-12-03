@@ -17,10 +17,12 @@ export function createUser(user: User) {
     return axios.post(`${BASE_URL}/user`, user);
 }
 
-export function getUser(id: string) {
-    return axios.get(`${BASE_URL}/user/${id}`);
+export async function getUser(id: string) {
+    const response = await axios.get(`${BASE_URL}/user/${id}`);
+    return response.data;
 }
 
-export function updateUser(id: string, user: UpdateUser) {
-    return axios.put(`${BASE_URL}/user/${id}`, user);
+export async function updateUser(id: string, user: UpdateUser) {
+    const response = await axios.put(`${BASE_URL}/user/${id}`, user);
+    return response.data;
 }

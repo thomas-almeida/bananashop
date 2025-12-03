@@ -4,16 +4,21 @@ import Button from "@/app/components/form/Button";
 import { Mail, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useShop } from "@/hooks/use-shop";
 
 export default function Store() {
     const { storename } = useParams();
+    const { publicStore } = useShop(storename as string);
+
+    console.log("Store data:", publicStore);
+
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-2 p-2 rounded-md">
                 <div className="w-[90%]">
                     <div className="flex flex-col items-center gap-2 shadow-md rounded-md border border-gray-300 p-2 py-6">
                         <Image
-                            src="/logo.png"
+                            src={publicStore?.image || "/logo.png"}
                             alt="Logo"
                             width={65}
                             height={65}
@@ -21,7 +26,10 @@ export default function Store() {
                         />
                         <div className="px-4 text-center">
                             <h1 className="text-xl font-bold text-black py-1">{storename}</h1>
-                            <p className="text-gray-500">Descrição do produto simples e rápida como tamanho e detalhes</p>
+                            <h2 className="text-md font-medium text-gray-700">@{publicStore?.igNickname}</h2>
+                            <p className="text-gray-500 py-3">
+                                {publicStore?.description}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -46,7 +54,7 @@ export default function Store() {
                 <div>
                     <h2 className="text-xl font-semibold my-4">Produtos</h2>
                     <div>
-                        
+
                     </div>
                 </div>
             </div>
