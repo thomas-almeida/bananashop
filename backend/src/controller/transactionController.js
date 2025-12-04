@@ -1,6 +1,6 @@
 import Transaction from "../db/models/Transactions.js";
 import axios from "axios";
-
+import { notifyPaymentUpdate } from "../socket/index.js";
 export const createTransaction = async (req, res) => {
     try {
 
@@ -87,7 +87,9 @@ export const abacatepayWebhook = async (req, res) => {
             }
         );
 
-        console.log("✅ PIX confirmado:", externalId);
+        // Notifica os clientes sobre a atualização do pagamento
+        await notifyPaymentUpdate(externalId, 'PAID');
+        console.log("✅ PIX confirmado e notificação enviada:", externalId);
 
         return res.status(200).json({ received: true });
 
