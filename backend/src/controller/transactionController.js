@@ -45,35 +45,45 @@ export const createTransaction = async (req, res) => {
     }
 };
 
-//webhook
+
 export const abacatepayWebhook = async (req, res) => {
     try {
         const webhookSecret = req.query.webhookSecret;
 
-        // 🚨 VALIDAÇÃO DE SEGURANÇA
+        // 🔐 Validação do secret
         if (webhookSecret !== process.env.WEBHOOK_SECRET) {
             console.warn("⚠️ Webhook bloqueado - Secret inválido!");
             return res.sendStatus(401);
         }
 
-        const { event, billing } = req.body;
+        const { event, data } = req.body;
 
         console.log("📩 Webhook recebido:", event);
 
-        // Só atua no evento que importa
         if (event !== "billing.paid") {
             return res.sendStatus(200);
         }
 
-        const externalId = billing.metadata.externalId;
+        // ✅ EXTRAÇÃO CORRETA DOS DADOS
+        const pixQrCode = data?.pixQrCode;
 
-        // Atualiza sua transaction no banco
+        if (!pixQrCode) {
+            console.warn("⚠️ Webhook sem pixQrCode:", req.body);
+            return res.sendStatus(400);
+        }
+
+        const externalId = pixQrCode.metadata?.externalId;
+
+        if (!externalId) {
+            console.warn("⚠️ Webhook sem externalId:", pixQrCode);
+            return res.sendStatus(400);
+        }
+
+        // ✅ Atualiza sua transaction
         await Transaction.findByIdAndUpdate(
             externalId,
             {
-                status: "PAID",
-                abacateBillingId: billing.id,
-                paidAt: new Date()
+                status: "PAID"
             }
         );
 
