@@ -5,12 +5,16 @@ import { useProducts } from "@/hooks/use-products"
 import { useUser } from "@/hooks/use-user";
 import Button from "@/app/components/form/Button";
 import CreateProductModal from "@/app/components/modal/createProductModal";
-import { File, Plus, Eye, SquarePen } from "lucide-react";
+import { File, Plus, ArrowLeft, Eye, SquarePen } from "lucide-react";
+import Link from "next/link";
+import ProductAdmin from "@/app/components/products/productAdmin";
 import Image from "next/image";
 
 export default function Products() {
     const { products, loading, refetch } = useProducts();
     const [isModalOpen, setModalOpen] = useState(false)
+    const [editing, setIsEditing] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState(0)
     const { user } = useUser();
     console.log(products)
 
@@ -21,6 +25,14 @@ export default function Products() {
     return (
         <>
             <div className="px-4">
+
+                <Link
+                    href={"/dashboard"}
+                    className="flex justify-start items-center mb-5"
+                >
+                    <ArrowLeft />
+                    Voltar
+                </Link>
 
                 <div>
                     <h1 className="text-3xl font-semibold">Produtos</h1>
@@ -34,7 +46,7 @@ export default function Products() {
                     />
                 </div>
 
-                <div className="">
+                <div>
                     {
                         products == null && (
                             <>
@@ -85,12 +97,23 @@ export default function Products() {
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        <div className="p-4 border border-slate-200 rounded-md shadow bg-[#22C55E] text-white">
-                                            <Eye />
-                                            Ver Produto
-                                        </div>
-                                        <div className="p-4 border border-slate-200 rounded-md shadow">
-                                            <SquarePen />
+                                        <Link href={`/loja/produto/${product?._id}`}>
+                                            <div className="p-4 border border-slate-200 rounded-md shadow bg-[#22C55E] text-white">
+
+                                                <Eye className="w-4 h-4 mr-2 inline" />
+                                                Ver Produto
+
+                                            </div>
+                                        </Link>
+                                        <div
+                                            onClick={() => {
+                                                setModalOpen(true)
+                                                setIsEditing(true)
+                                                setSelectedProduct(idx)
+                                            }}
+                                            className="p-4 border border-slate-200 rounded-md shadow cursor-pointer"
+                                        >
+                                            <SquarePen className="w-4 h-4 mr-2 inline" />
                                             Editar
                                         </div>
                                     </div>
@@ -102,6 +125,8 @@ export default function Products() {
             </div>
             <CreateProductModal
                 isOpen={isModalOpen}
+                isEditing={editing}
+                product={selectedProduct >= 0 ? products[selectedProduct] : null}
                 onClose={() => {
                     setModalOpen(false)
                     refetch()

@@ -1,7 +1,7 @@
 import Input from "../form/Input";
-import { Tag, DollarSign, Landmark, Box, Plus } from "lucide-react"
+import { Tag, DollarSign, Landmark, Box, Plus, Pencil } from "lucide-react"
 import ImageUploadCarousel from "../ImageUploadCarousel";
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Button from "../form/Button";
 import { productSchema } from "@/app/dashboard/products/schemas/productSchema";
 import { z } from "zod"
@@ -10,32 +10,63 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createProduct, createProductPayload } from "@/app/service/productService";
 import { uploadImage } from "@/app/service/uploadService";
 import { useProducts } from "@/hooks/use-products";
+import { ImageFile } from "../ImageUploadCarousel";
 
 interface CreateProductModalProps {
     isOpen: boolean;
+    isEditing?: boolean;
+    product?: any;
     onClose: () => void;
     storeId: string;
 }
 
 type ProductFormData = z.infer<typeof productSchema>
 
-export default function CreateProductModal({ isOpen, onClose, storeId }: CreateProductModalProps) {
+export default function CreateProductModal({ isOpen, onClose, storeId, isEditing, product }: CreateProductModalProps) {
     if (!isOpen) return null;
 
-    const [images, setImages] = useState<File[]>([])
-    const [isFetching, setIsFetching] = useState(false)
+    const [images, setImages] = useState<ImageFile[]>([]);
+    const [initialImages, setInitialImages] = useState<string[]>([]);
+    const [isFetching, setIsFetching] = useState(false);
     const { refetch } = useProducts();
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<ProductFormData>({
+
+    const { register, handleSubmit, formState: { errors } } = useForm<ProductFormData>({
         resolver: zodResolver(productSchema),
-        defaultValues: {}
-    })
+        defaultValues: product ? {
+            name: product.name || '',
+            price: product.price || 0,
+            description: product.description || '',
+            brand: product.brand || '',
+            inStorage: product.inStorage || 0,
+        } : {}
+    });
+
+    // Carrega as imagens iniciais quando o produto para edição é definido
+    useEffect(() => {
+        if (isEditing && product?.images) {
+            setInitialImages(product.images);
+            // Mapeia as imagens existentes para o formato esperado pelo componente
+            const existingImages = product.images.map((url: string) => {
+                const filename = url.split('/').pop() || 'image.jpg';
+                const file = new File([], filename, { type: 'image/jpeg' }) as ImageFile;
+                file.url = url;
+                file.isExisting = true;
+                return file;
+            });
+            setImages(existingImages);
+        }
+    }, [isEditing, product]);
+
+    const handleImagesChange = useCallback((newImages: ImageFile[]) => {
+        // Filtra apenas as imagens que não são existentes ou que não foram marcadas para remoção
+        const validImages = newImages.filter(img =>
+            !img.isExisting || img.isExisting === true
+        );
+        setImages(validImages);
+    }, []);
 
     const onSubmit = async (data: ProductFormData) => {
-        if (!images.length) {
+        if (images.length === 0) {
             alert('Por favor, adicione pelo menos uma imagem do produto');
             return;
         }
@@ -43,38 +74,65 @@ export default function CreateProductModal({ isOpen, onClose, storeId }: CreateP
         setIsFetching(true);
 
         try {
-            // Fazer upload de cada imagem
-            const imageUploadPromises = images.map(file => {
+            // Filtra apenas imagens que não são existentes (novas) ou que não foram marcadas para remoção
+            const imagesToUpload = images.filter(img =>
+                img.isExisting === undefined || img.isExisting === true
+            );
+
+            // Fazer upload apenas das novas imagens
+            const newImages = imagesToUpload.filter(img => !img.isExisting);
+            const existingImages = imagesToUpload.filter(img => img.isExisting);
+
+            const imageUploadPromises = newImages.map(file => {
                 return uploadImage(file);
             });
 
             // Aguardar todos os uploads terminarem
             const uploadResults = await Promise.all(imageUploadPromises);
 
-            // Extrair as URLs das imagens
-            const imageUrls = uploadResults.map(result => result.imageUrl);
+            // Extrair as URLs das novas imagens
+            const newImageUrls = uploadResults.map((result: { imageUrl: string }) => result.imageUrl);
+
+            // Manter as URLs das imagens existentes que não foram removidas
+            const existingImageUrls = existingImages
+                .filter((img: ImageFile) => img.url)
+                .map((img: ImageFile) => img.url as string);
+
+            // Juntar as URLs das imagens existentes com as novas
+            const allImageUrls = [...existingImageUrls, ...newImageUrls];
+
+            if (allImageUrls.length === 0) {
+                alert('Pelo menos uma imagem é obrigatória');
+                return;
+            }
 
             // Criar o produto com as URLs das imagens
             const productData: createProductPayload = {
                 name: data.name,
                 price: Number(data.price),
                 description: data.description,
-                stock: Number(data.stock),
+                inStorage: Number(data.inStorage),
                 ...(data.brand && { brand: data.brand }),
-                images: imageUrls
+                images: allImageUrls
             };
 
-            await createProduct(storeId, productData);
+            if (isEditing && product?._id) {
+                const productWithId = { ...productData, productId: product?._id };
+                await createProduct(storeId, productWithId);
+                alert("Produto atualizado com sucesso!");
+            } else {
+                await createProduct(storeId, productData);
+                alert("Produto criado com sucesso!");
+            }
 
             // Fechar o modal e limpar o formulário
             onClose();
             setImages([]);
-            alert("Produto criado com sucesso!")
             refetch();
-        
+
         } catch (error) {
-            console.error('Erro ao criar produto:', error);
-            alert('Ocorreu um erro ao criar o produto. Por favor, tente novamente.');
+            console.error('Erro ao salvar produto:', error);
+            alert('Ocorreu um erro ao salvar o produto. Por favor, tente novamente.');
         } finally {
             setIsFetching(false);
         }
@@ -103,7 +161,9 @@ export default function CreateProductModal({ isOpen, onClose, storeId }: CreateP
             >
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Criar Produto</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            {isEditing ? "Editar Produto" : "Criar Produto"}
+                        </h1>
                         <p className="text-gray-500">Insira as informações do seu produto abaixo</p>
                     </div>
                     <button
@@ -129,8 +189,8 @@ export default function CreateProductModal({ isOpen, onClose, storeId }: CreateP
                                 Imagens do Produto
                             </label>
                             <ImageUploadCarousel
-                                onImagesChange={setImages}
-                                {...register("images")}
+                                onImagesChange={handleImagesChange}
+                                initialImages={initialImages}
                                 maxImages={5}
                             />
                         </div>
@@ -161,8 +221,8 @@ export default function CreateProductModal({ isOpen, onClose, storeId }: CreateP
                             placeholder="Em estoque"
                             type="number"
                             icon={<Landmark className="h-6 w-6 text-gray-400" />}
-                            {...register("stock", { valueAsNumber: true })}
-                            className={errors.stock && "border border-red-300"}
+                            {...register("inStorage", { valueAsNumber: true })}
+                            className={errors.inStorage && "border border-red-300"}
                         />
                         <textarea
                             placeholder="Descrição do produto"
@@ -172,10 +232,10 @@ export default function CreateProductModal({ isOpen, onClose, storeId }: CreateP
                         />
                         <Button
                             type="submit"
-                            text={isFetching ? "Criando..." : "Criar Produto"}
+                            text={isEditing ? "Editar" : "Criar"}
                             color="primary"
                             loading={isFetching}
-                            icon={<Plus />}
+                            icon={isEditing ? <Pencil /> : <Plus />}
                         />
 
                     </form>

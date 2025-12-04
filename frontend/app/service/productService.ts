@@ -7,7 +7,7 @@ export interface createProductPayload {
     description: string;
     brand?: string;
     images: string[];
-    stock: number;
+    inStorage: number;
 }
 
 export const getProductsByStore = async (storeId: string) => {
@@ -19,6 +19,16 @@ export const getProductsByStore = async (storeId: string) => {
         throw error;
     }
 };
+
+export const getProductById = async (productId: string) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/products/get-product/${productId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        throw error;
+    }
+}
 
 export const createProduct = async (storeId: string, payload: createProductPayload) => {
     try {

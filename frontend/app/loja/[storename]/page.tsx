@@ -5,6 +5,8 @@ import { Mail, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useShop } from "@/hooks/use-shop";
+import ProductItem from "@/app/components/products/productItem";
+import Link from "next/link";
 
 export default function Store() {
     const { storename } = useParams();
@@ -34,26 +36,54 @@ export default function Store() {
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 w-[90%] my-2">
-                    <Button
-                        text="Whatsapp"
-                        onClick={() => { }}
-                        type="button"
-                        color="primary"
-                        className="px-4 w-full"
-                        icon={<MessageCircle />}
-                    />
-                    <Button
-                        text="Email"
-                        onClick={() => { }}
-                        type="button"
-                        color="secondary"
-                        className="px-4 w-full"
-                        icon={<Mail />}
-                    />
+                    <Link
+                        href={`https://api.whatsapp.com/send?phone=55${publicStore?.whatsappNumber}&text=Olá%2C%20vi%20sua%20loja%20no%20bananashop!%20🍌`}
+                        target="_blank"
+                    >
+                        <Button
+                            text="Whatsapp"
+                            onClick={() => { }}
+                            type="button"
+                            color="primary"
+                            className="px-4 w-full"
+                            icon={<MessageCircle />}
+                        />
+                    </Link>
+                    <Link href={`mailto:${publicStore?.owner?.email || ''}`}>
+                        <Button
+                            text="Email"
+                            onClick={() => { }}
+                            type="button"
+                            color="secondary"
+                            className="px-4 w-full"
+                            icon={<Mail />}
+                        />
+                    </Link>
+
                 </div>
                 <div>
                     <h2 className="text-xl font-semibold my-4">Produtos</h2>
                     <div>
+
+                        {
+                            publicStore?.products ? (
+                                <>
+                                    <div className="grid grid-cols-1 gap-4">
+
+                                        {
+                                            publicStore.products?.map((product: any, idx: number) => (
+                                                <ProductItem key={idx} product={product} />
+                                            ))
+                                        }
+
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-gray-500 text-center">Nenhum produto por enquanto</p>
+                                </>
+                            )
+                        }
 
                     </div>
                 </div>

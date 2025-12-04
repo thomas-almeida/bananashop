@@ -13,6 +13,10 @@ type Store = {
     whatsappNumber: string;
     views: number;
     products: any[];
+    owner: {
+        email: string;
+        username: string
+    }
 }
 
 export function useShop(storeId?: string) {
@@ -25,7 +29,7 @@ export function useShop(storeId?: string) {
     useEffect(() => {
         async function fetchStore() {
             const userId = session?.user.id
-            
+
             if (!userId) {
                 setLoading(false)
                 return

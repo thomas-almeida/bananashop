@@ -25,7 +25,6 @@ export function useUser() {
     useEffect(() => {
         async function fetchUser() {
             const userId = session?.user?.id;
-            const userStorage = localStorage.getItem("userStore");
 
             if (!userId) {
                 setLoading(false);
@@ -33,14 +32,6 @@ export function useUser() {
             }
 
             try {
-
-                if (userStorage !== null) {
-                    const parsedUser = JSON.parse(userStorage);
-                    setUser(parsedUser);
-                    setLoading(false);
-                    return;
-                }
-
                 const userData = await getUser(userId);
                 localStorage.setItem("userStore", JSON.stringify(userData));
                 setUser(userData);

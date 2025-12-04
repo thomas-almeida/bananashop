@@ -4,21 +4,37 @@
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { pageTree } from "@/app/utils/page-tree"
 import { useUser } from "@/hooks/use-user"
 import { useShop } from "@/hooks/use-shop"
 import Button from "../components/form/Button"
 
 export default function Dashboard() {
+    const router = useRouter();
     const { data: session } = useSession()
     const { user, loading } = useUser()
     const { store, loading: shopLoading } = useShop()
 
-    if (loading || shopLoading) {
+    useEffect(() => {
+        // Se não estiver mais carregando, verifica se o usuário tem uma loja
+        if (!loading) {
+            // Se o usuário não tiver uma loja (store === null), redireciona para onboarding
+            if (user?.store === null) {
+                router.push('/onboarding');
+            }
+        }
+    }, [loading, user, router]);
+
+    if (loading) {
         return <div>Loading...</div>;
     }
 
-    console.log("Store:", store);
+    // Se o usuário não tiver uma loja, não renderiza nada (já que será redirecionado)
+    if (user?.store === null) {
+        return null;
+    }
 
     return (
         <>
