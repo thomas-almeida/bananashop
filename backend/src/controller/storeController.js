@@ -71,27 +71,62 @@ export const getStoreByUserId = async (req, res) => {
     }
 };
 
-export const getStoreByName = async (req, res) => {
+export const getStoreById = async (req, res) => {
     try {
-        const { storeName } = req.params;
+        const { storeId } = req.params;
 
-        const store = await Store.findOne({ 
-            name: storeName
-        })
-        .populate('products', 'name price images')
-        .populate('owner', 'username email')
-        .lean();
+        const store = await Store.findById(storeId)
+            .populate('products', 'name price images')
+            .populate('owner', 'username email')
+            .lean();
 
         if (!store) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 success: false,
-                message: "Loja não encontrada" 
+                message: "Loja não encontrada"
             });
         }
 
         // Incrementa o contador de visualizações
-        await Store.findByIdAndUpdate(store._id, { 
-            $inc: { views: 1 } 
+        await Store.findByIdAndUpdate(store._id, {
+            $inc: { views: 1 }
+        });
+        store.views += 1; // Atualiza o objeto local para refletir o incremento
+
+        return res.status(200).json({
+            success: true,
+            data: store
+        });
+    } catch (error) {
+        console.error("Error getting store:", error);
+        return res.status(500).json({
+            message: "Error getting store",
+            error: error.message
+        });
+    }
+}
+
+export const getStoreByName = async (req, res) => {
+    try {
+        const { storeName } = req.params;
+
+        const store = await Store.findOne({
+            name: storeName
+        })
+            .populate('products', 'name price images')
+            .populate('owner', 'username email')
+            .lean();
+
+        if (!store) {
+            return res.status(404).json({
+                success: false,
+                message: "Loja não encontrada"
+            });
+        }
+
+        // Incrementa o contador de visualizações
+        await Store.findByIdAndUpdate(store._id, {
+            $inc: { views: 1 }
         });
         store.views += 1; // Atualiza o objeto local para refletir o incremento
 

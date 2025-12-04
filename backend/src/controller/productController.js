@@ -10,6 +10,7 @@ export const createProduct = async (req, res) => {
     try {
         const { storeId } = req.params;
         const {
+            productId,
             name,
             price,
             description,
@@ -25,36 +26,85 @@ export const createProduct = async (req, res) => {
             return res.status(404).json({ message: "Store not found" });
         }
 
-        // Primeiro cria o produto sem o publicLink
-        const product = new Product({
-            name,
-            price,
-            description,
-            brand: brand || "",
-            images: images || [],
-            category: category || "",
-            inStorage: inStorage || 0,
-            store: storeId
-        });
+        let product;
+        let isNewProduct = true;
 
-        // Depois de criado, atualiza o publicLink com o ID gerado
-        product.publicLink = `${process.env.PUBLIC_BASEURL}/produto/${product._id}`;
+        // Se um productId for fornecido, tenta atualizar o produto existente
+        if (productId) {
+            product = await Product.findOne({ _id: productId, store: storeId });
 
-        // Salva o produto
+            if (!product) {
+                return res.status(404).json({ message: "Product not found in this store" });
+            }
+
+            // Atualiza os campos do produto
+            product.name = name || product.name;
+            product.price = price !== undefined ? price : product.price;
+            product.description = description || product.description;
+            product.brand = brand !== undefined ? brand : product.brand;
+            product.images = images || product.images;
+            product.category = category || product.category;
+            product.inStorage = inStorage !== undefined ? inStorage : product.inStorage;
+
+            isNewProduct = false;
+        } else {
+            // Cria um novo produto
+            product = new Product({
+                name,
+                price,
+                description,
+                brand: brand || "",
+                images: images || [],
+                category: category || "",
+                inStorage: inStorage || 0,
+                store: storeId
+            });
+
+            // Define o publicLink para novos produtos
+            product.publicLink = `${process.env.PUBLIC_BASEURL}/produto/${product._id}`;
+
+            // Adiciona o produto à loja
+            store.products.push(product._id);
+            await store.save();
+        }
+
+        // Salva o produto (cria ou atualiza)
         await product.save();
 
-        // Adiciona o produto à loja
-        store.products.push(product._id);
-        await store.save();
-
-        return res.status(201).json({
-            message: "Product created successfully",
+        return res.status(isNewProduct ? 201 : 200).json({
+            message: isNewProduct
+                ? "Product created successfully"
+                : "Product updated successfully",
             product
         });
     } catch (error) {
-        console.error("Error creating product:", error);
+        console.error(`Error ${req.params.productId ? 'updating' : 'creating'} product:`, error);
         return res.status(500).json({
-            message: "Error creating product",
+            message: `Error ${req.params.productId ? 'updating' : 'creating'} product`,
+            error: error.message
+        });
+    }
+};
+
+export const getProductById = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        // Busca o produto pelo ID
+        const product = await Product.findById(productId)
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        console.error("Error getting product:", error);
+        return res.status(500).json({
+            message: "Error getting product",
             error: error.message
         });
     }

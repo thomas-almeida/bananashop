@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createStore, getStoreByUserId, updateStore, getStoreByName } from '../controller/storeController.js';
+import { createStore, getStoreByUserId, getStoreById, updateStore, getStoreByName } from '../controller/storeController.js';
 
 const router = Router();
 
@@ -11,6 +11,7 @@ router.post('/:userId/create', createStore);
 // GET /api/stores/user/:userId
 router.get('/:userId', getStoreByUserId);
 router.get('/name/:storeName', getStoreByName);
+router.get('/by-id/:storeId', getStoreById);
 
 // Atualiza uma loja
 // PUT /api/stores/:storeId

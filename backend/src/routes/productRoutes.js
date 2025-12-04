@@ -5,6 +5,7 @@ import path from 'path';
 import {
   createProduct,
   getProductsByStore,
+  getProductById,
   updateProduct,
   deleteProduct
 } from '../controller/productController.js';
@@ -34,6 +35,7 @@ router.post('/:storeId/create', createProduct);
  * GET /api/products/:storeId
  */
 router.get('/:storeId', getProductsByStore);
+router.get('/get-product/:productId', getProductById);
 
 /**
  * Atualiza um produto
