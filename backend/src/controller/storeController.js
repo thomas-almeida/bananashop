@@ -113,7 +113,7 @@ export const getStoreByName = async (req, res) => {
         const store = await Store.findOne({
             name: storeName
         })
-            .populate('products', 'name price images')
+            .populate('products', 'name price images description')
             .populate('owner', 'username email')
             .lean();
 
