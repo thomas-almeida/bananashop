@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createUser, getUserById, updateUser } from "../controller/userController.js";
 import { upload, uploadImage } from "../controller/uploadController.js";
+import { createTransaction, abacateWebhook } from "../controller/transactionController.js";
 import storeRoutes from "./storeRoutes.js";
 import productRoutes from "./productRoutes.js";
 
@@ -20,5 +21,9 @@ api.use('/products', productRoutes);
 
 // Rotas de upload
 api.post('/upload-image', upload.single('image'), uploadImage);
+
+// Transações
+api.post('/transaction', createTransaction);
+api.post('/abacatepay', abacateWebhook);
 
 export default api;
