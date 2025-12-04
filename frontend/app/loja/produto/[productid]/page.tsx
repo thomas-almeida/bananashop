@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProductById } from "@/app/service/productService";
 import Link from "next/link";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Share2 } from "lucide-react";
 import Image from "next/image";
 import Button from "@/app/components/form/Button";
 import Slider from "react-slick";
@@ -18,10 +18,34 @@ export default function ProductPage() {
     const [product, setProduct] = useState<any | null>(null);
     const [storeInfo, setStoreInfo] = useState<any | null>(null);
     const [openAccordion, setOpenAccordion] = useState<number | null>(null);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [isCopied, setIsCopied] = useState(false);
 
     const toggleAccordion = (index: number) => {
         setOpenAccordion(openAccordion === index ? null : index);
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: product?.name || 'Produto',
+            text: product?.description || 'Confira este produto',
+            url: window.location.href,
+        };
+
+        try {
+            if (navigator.share) {
+                // Usa a API Web Share se disponível (mobile)
+                await navigator.share(shareData);
+            } else {
+                // Fallback para copiar o link
+                await navigator.clipboard.writeText(window.location.href);
+                setIsCopied(true);
+                // Reseta o estado após 2 segundos
+                setTimeout(() => setIsCopied(false), 2000);
+            }
+        } catch (err) {
+            console.error('Erro ao compartilhar:', err);
+        }
     };
 
     useEffect(() => {
@@ -117,11 +141,22 @@ export default function ProductPage() {
                                 )
                             }
 
-                            <Button
-                                text="Comprar Agora no PIX"
-                                color="primary"
-                                onClick={() => { }}
-                            />
+                            <div className="flex flex-col gap-2 w-full">
+                                <Button
+                                    text="Comprar Agora no PIX"
+                                    color="primary"
+                                    onClick={() => { }}
+                                    icon={<Image src={"/pix.png"} width={20} height={20} alt="pix" />}
+                                    className="w-full"
+                                />
+                                <Button
+                                    text={isCopied ? "Link copiado!" : "Compartilhar"}
+                                    color="secondary"
+                                    onClick={handleShare}
+                                    icon={<Share2 size={18} className="mr-2" />}
+                                    className="w-full flex items-center justify-center"
+                                />
+                            </div>
 
                             <div className="mt-8 w-full max-w-2xl">
                                 <h3 className="text-xl font-bold mb-4">Dúvidas de como comprar:</h3>

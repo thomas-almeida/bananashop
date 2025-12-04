@@ -36,6 +36,7 @@ export default function ProductItem({ product }: { product: any }) {
                 text="Comprar Agora no PIX"
                 color="primary"
                 className="px-4 w-full mt-4"
+                icon={<Image src={"/pix.png"} width={20} height={20} alt="pix" />}
             />
         </Link>
     )
