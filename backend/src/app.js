@@ -38,18 +38,52 @@ io.on('connection', (socket) => {
 
   // Evento para acompanhar uma transação específica
   socket.on('watch-transaction', (transactionId) => {
-    if (transactionId) {
-      socket.join(`transaction:${transactionId}`);
-      console.log(`👀 Cliente ${socket.id} está assistindo transação: ${transactionId}`);
-      
-      // Confirmação para o cliente
-      socket.emit('watching-transaction', { transactionId });
+    if (!transactionId) {
+      console.warn('⚠️  Transação inválida recebida do cliente:', socket.id);
+      return;
     }
+
+    const room = `transaction:${transactionId}`;
+    
+    // Entra na sala
+    socket.join(room);
+    
+    // Lista todas as salas atuais (apenas para debug)
+    const rooms = Array.from(socket.rooms);
+    console.log(`👤 Cliente ${socket.id} entrou na sala:`, room);
+    console.log(`🏠 Salas atuais do cliente:`, rooms);
+    console.log(`👥 Total de salas ativas:`, io.sockets.adapter.rooms.size);
+    
+    // Confirmação para o cliente
+    socket.emit('watching-transaction', { 
+      success: true, 
+      transactionId,
+      room,
+      message: 'Agora você está recebendo atualizações desta transação'
+    });
   });
 
   // Lidar com desconexão
-  socket.on('disconnect', () => {
-    console.log('❌ Cliente desconectado:', socket.id);
+  socket.on('disconnect', (reason) => {
+    console.log(`❌ Cliente ${socket.id} desconectado. Motivo:`, reason);
+    
+    // Lista todas as salas que o cliente estava
+    const rooms = Array.from(socket.rooms);
+    console.log(`🚪 Cliente saiu das salas:`, rooms);
+  });
+
+  // Log de erros
+  socket.on('error', (error) => {
+    console.error('❌ Erro no socket:', error);
+  });
+});
+
+// Log de erros globais do Socket.IO
+io.engine.on('connection_error', (err) => {
+  console.error('❌ Erro na conexão do Socket.IO:', {
+    code: err.code,
+    message: err.message,
+    context: err.context
   });
 });
 
