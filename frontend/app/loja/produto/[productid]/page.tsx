@@ -167,28 +167,31 @@ export default function ProductPage() {
                                                 fill
                                                 style={{ objectFit: 'cover' }}
                                                 priority={index === 0}
-                                                className="rounded-xl shadow-lg"
+                                                className="rounded-xl shadow-lg border border-slate-300"
                                             />
                                         </div>
                                     ))}
                                 </Slider>
                             </div>
+                            <b className={`text-${product?.inStorage > 0 ? "green-500" : "red-500"}`}>{product?.inStorage > 0 ? "Disponível" : "Esgotado"}</b>
                             <h1 className="text-3xl font-bold uppercase py-2">{product?.name}</h1>
-                            <p className="text-lg">{product?.description}</p>
+                            <p className="text-lg pb-2">{product?.description}</p>
                             <h2 className="text-4xl py-3 font-bold">{product?.price?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h2>
                             {
                                 product?.brand !== "" && (
-                                    <p className="text-lg pb-4">Marca: <b className="text-neutral-700">{product?.brand}</b></p>
+                                    <p className="text-lg pb-1">Marca: <b className="text-neutral-700">{product?.brand}</b></p>
                                 )
                             }
+                            <p className="font-semibold text-lg text-neutral-800 pb-4">{product?.inStorage} Disponíveis</p>
 
                             <div className="flex flex-col gap-2 w-full">
                                 <Button
-                                    text="Comprar Agora no PIX"
+                                    text={product?.inStorage === 0 ? "Esgotado" : "Comprar Agora no PIX"}
                                     color="primary"
                                     onClick={() => setIsCheckoutOpen(true)}
-                                    icon={<Image src={"/pix.png"} width={20} height={20} alt="pix" />}
+                                    icon={product?.inStorage > 0 && <Image src={"/pix.png"} width={20} height={20} alt="pix" />}
                                     className="w-full"
+                                    disabled={product?.inStorage === 0}
                                 />
                                 <Button
                                     text={isCopied ? "Link copiado!" : "Compartilhar"}

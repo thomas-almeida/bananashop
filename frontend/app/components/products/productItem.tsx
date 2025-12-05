@@ -26,6 +26,7 @@ export default function ProductItem({ product }: { product: any }) {
                 </div>
                 <div className="w-full">
                     <h2 className="text-2xl font-semibold tracking-tighter leading- line-clamp-2 pb-1">{product?.name}</h2>
+                    <p className={`pb-1 text-${product?.inStorage > 0 ? "green-500 font-semibold" : "neutral-700 font-semibold"}`}>{product?.inStorage > 0 ? "Disponível" : "Esgotado"}</p>
                     <p className="text-sm text-gray-600 line-clamp-4 leading-tight">
                         {product?.description}
                     </p>

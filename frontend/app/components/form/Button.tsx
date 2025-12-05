@@ -21,7 +21,7 @@ export default function Button({ children, icon, text, onClick, className, color
             onClick={onClick}
             disabled={disabled}
             type={type}
-            className={`w-full py-4 cursor-pointer text-lg font-semibold shadow-sm rounded-md flex items-center justify-center ${color == "secondary" ? "border border-gray-300" : ""} ${className}`}
+            className={`w-full py-4 cursor-pointer text-lg font-semibold shadow-sm rounded-md flex items-center justify-center ${color == "secondary" ? "border border-gray-300" : ""} ${disabled ? 'opacity-60' : ''} ${className}`}
         >
             {
                 icon &&
