@@ -4,7 +4,9 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProductById } from "@/app/service/productService";
 import Link from "next/link";
-import { ChevronDown, ChevronUp, Share2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Share2, Check, Copy } from "lucide-react";
+import CheckoutModal from "@/app/components/modal/CheckoutModal";
+import PixPaymentModal from "@/app/components/modal/PixPaymentModal";
 import Image from "next/image";
 import Button from "@/app/components/form/Button";
 import Slider from "react-slick";
@@ -20,6 +22,45 @@ export default function ProductPage() {
     const [openAccordion, setOpenAccordion] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    const [isPixModalOpen, setIsPixModalOpen] = useState(false);
+    const [pixData, setPixData] = useState({
+        qrCode: "",
+        code: "",
+        pixId: "",
+        expiresIn: 0,
+        transactionId: ""
+    });
+
+    const handleCheckoutSuccess = async (transactionData: {
+        brcode: string;
+        brCodeBase64: string;
+        pixId: string;
+        expiresIn: number;
+        transactionId: string;
+    }) => {
+        try {
+            setPixData({
+                pixId: transactionData.pixId,
+                qrCode: transactionData.brCodeBase64,
+                code: transactionData.brcode,
+                expiresIn: transactionData.expiresIn,
+                transactionId: transactionData.transactionId
+            });
+            setIsPixModalOpen(true);
+        } catch (error) {
+            console.error('Erro ao gerar PIX:', error);
+            alert('Ocorreu um erro ao gerar o PIX. Por favor, tente novamente.');
+        }
+    };
+
+    // Função para formatar o preço
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(price);
+    };
 
     const toggleAccordion = (index: number) => {
         setOpenAccordion(openAccordion === index ? null : index);
@@ -145,7 +186,7 @@ export default function ProductPage() {
                                 <Button
                                     text="Comprar Agora no PIX"
                                     color="primary"
-                                    onClick={() => { }}
+                                    onClick={() => setIsCheckoutOpen(true)}
                                     icon={<Image src={"/pix.png"} width={20} height={20} alt="pix" />}
                                     className="w-full"
                                 />
@@ -221,6 +262,26 @@ export default function ProductPage() {
                         </div>
                     </div>
                     <Footer />
+
+                    <CheckoutModal
+                        isOpen={isCheckoutOpen}
+                        onClose={() => setIsCheckoutOpen(false)}
+                        onSuccess={handleCheckoutSuccess}
+                        productId={product._id}
+                        storeId={product.store}
+                        price={product.price}
+                        inStorage={product.inStorage}
+                    />
+
+                    <PixPaymentModal
+                        isOpen={isPixModalOpen}
+                        onClose={() => setIsPixModalOpen(false)}
+                        qrCode={pixData.qrCode}
+                        pixId={pixData.pixId}
+                        pixCode={pixData.code}
+                        expiresIn={pixData.expiresIn}
+                        transactionId={pixData.transactionId}
+                    />
                 </>
             ) : (
                 <p>Produto não encontrado</p>

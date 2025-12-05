@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     domains: [
       'lh3.googleusercontent.com',
       'res.cloudinary.com',
+      'api.qrserver.com'
     ],
   },
 };

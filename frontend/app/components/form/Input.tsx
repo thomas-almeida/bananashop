@@ -3,10 +3,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     placeholder: string;
     type: string;
     register?: any;
-    errors?: any;
+    errors?: {
+        message?: string;
+    };
     className?: string;
     label?: string;
     icon?: React.ReactNode;
+    name?: string;
 }
 
 export default function Input({
@@ -23,7 +26,7 @@ export default function Input({
     return (
         <div>
             {label && <label className="block font-bold pb-2 text-lg">{label}</label>}
-            <div className={`w-full border border-slate-300 shadow p-2 py-3 rounded flex justify-start gap-2 items-center ${className || ""}`}>
+            <div className={`w-full border ${errors ? 'border-red-500' : 'border-slate-300'} shadow p-2 py-3 rounded flex justify-start gap-2 items-center ${className || ''}`}>
                 {
                     icon && (
                         <span className="text-gray-500">
@@ -39,7 +42,7 @@ export default function Input({
                     {...props}
                 />
             </div>
-            {errors && <p className="text-red-500">{errors.message}</p>}
+            {errors?.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
         </div>
     )
 }
