@@ -108,6 +108,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                 image: imageUrl,
             });
             toast.success('Dados da loja atualizados com sucesso!');
+            alert("dados atualizados com sucesso!")
         } catch (error) {
             console.error('Error updating store:', error);
             toast.error('Erro ao atualizar dados da loja');
@@ -193,7 +194,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                 <div className="flex justify-end">
                     <Button
                         type="submit"
-                        text="Salvar Alterações"
+                        text={isLoading ? "Salvando..." : "Salvar Alterações"}
                         isLoading={isLoading}
                         className="px-6"
                         color='primary'
