@@ -36,7 +36,8 @@ export const createTransaction = async (req, res) => {
             brcode: data?.data?.brCode,
             brCodeBase64: data?.data?.brCodeBase64,
             pixId: data?.data?.id,
-            expiresIn: payload.expiresIn
+            expiresIn: payload.expiresIn,
+            transactionId: tx?._id
         });
 
     } catch (error) {
