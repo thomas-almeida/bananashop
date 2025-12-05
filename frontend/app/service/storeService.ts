@@ -20,9 +20,9 @@ export const createStore = async (userId: string, storeData: StorePayload) => {
 };
 
 
-export const updateStore = async (userId: string, storeData: any) => {
+export const updateStore = async (storeId: string, storeData: any) => {
     try {
-        const response = await axios.put(`${BASE_URL}/stores/${userId}/update`, storeData);
+        const response = await axios.put(`${BASE_URL}/stores/${storeId}/update`, storeData);
         return response.data;
     } catch (error) {
         console.error('Error updating store:', error);

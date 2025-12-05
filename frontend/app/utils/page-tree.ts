@@ -9,7 +9,7 @@ export const pageTree = [
     },
     {
         name: "Ajustes",
-        href: "/dashboard/settings",
+        href: "/dashboard/configuracoes",
         icon: Settings,
     },
     {

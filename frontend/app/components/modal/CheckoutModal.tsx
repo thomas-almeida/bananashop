@@ -120,7 +120,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                             type="text"
                             icon={<User className="h-5 w-5 text-gray-400" />}
                             {...register("name")}
-                            errors={errors.name}
+                            error={errors.name}
                         />
 
                         <Input
@@ -128,7 +128,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                             type="email"
                             icon={<Mail className="h-5 w-5 text-gray-400" />}
                             {...register("email")}
-                            errors={errors.email}
+                            error={errors.email}
                         />
 
                         <Input
@@ -136,7 +136,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                             type="tel"
                             icon={<Phone className="h-5 w-5 text-gray-400" />}
                             {...register("phone")}
-                            errors={errors.phone}
+                            error={errors.phone}
                         />
 
                         <div className="grid grid-cols-1 gap-4">
@@ -173,7 +173,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                                 type="text"
                                 icon={<MapPinIcon className="h-5 w-5 text-gray-400" />}
                                 {...register("zipCode")}
-                                errors={errors.zipCode}
+                                error={errors.zipCode}
                             />
 
                             <Input
@@ -181,7 +181,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                                 type="text"
                                 icon={<Map className="h-5 w-5 text-gray-400" />}
                                 {...register("state")}
-                                errors={errors.state}
+                                error={errors.state}
                             />
                         </div>
 
@@ -190,7 +190,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                             type="text"
                             icon={<MapPin className="h-5 w-5 text-gray-400" />}
                             {...register("city")}
-                            errors={errors.city}
+                            error={errors.city}
                         />
 
                         <Input
@@ -198,7 +198,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                             type="text"
                             icon={<Home className="h-5 w-5 text-gray-400" />}
                             {...register("address")}
-                            errors={errors.address}
+                            error={errors.address}
                         />
 
                         <div className="mt-4 pt-4 border-t border-gray-200">

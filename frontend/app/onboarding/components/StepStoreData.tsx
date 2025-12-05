@@ -125,7 +125,7 @@ export default function StepStoreData() {
       <Input
         placeholder="bananashop"
         register={register("storeName")}
-        errors={errors.storeName}
+        error={errors.storeName}
         type="text"
         label="Nome da loja"
         className={errors.storeName ? "border-red-500" : ""}
@@ -135,7 +135,7 @@ export default function StepStoreData() {
       <Input
         placeholder="Loja de softwares sob demanda"
         register={register("description")}
-        errors={errors.description}
+        error={errors.description}
         type="text"
         label="Descrição da loja"
         className={errors.description ? "border-red-500" : ""}
@@ -144,7 +144,7 @@ export default function StepStoreData() {
       <Input
         placeholder="bananashop"
         register={register("instagram")}
-        errors={errors.instagram}
+        error={errors.instagram}
         type="text"
         label="Instagram da Loja"
         className={errors.instagram ? "border-red-500" : ""}
@@ -154,7 +154,7 @@ export default function StepStoreData() {
       <Input
         placeholder="(00) 0000-0000"
         register={register("whatsapp")}
-        errors={errors.whatsapp}
+        error={errors.whatsapp}
         type="text"
         label="Whatsapp do responsável"
         className={errors.whatsapp ? "border-red-500" : ""}

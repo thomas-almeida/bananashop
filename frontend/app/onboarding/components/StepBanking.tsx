@@ -105,7 +105,7 @@ export default function StepBanking() {
                 <Input
                     placeholder="Informe seu CPF"
                     register={register("taxID")}
-                    errors={errors.taxID}
+                    error={errors.taxID}
                     type="text"
                     label="CPF"
                     icon={<User size={20} />}
@@ -117,7 +117,7 @@ export default function StepBanking() {
                 <Input
                     placeholder="Sua chave Pix de preferência"
                     register={register("pixKey")}
-                    errors={errors.pixKey}
+                    error={errors.pixKey}
                     type="text"
                     label="Chave Pix"
                     icon={<Landmark size={20} />}
