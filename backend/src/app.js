@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3333;
 // Configuração do CORS
 const corsOptions = {
   origin: process.env.FRONTEND_URL || '*', // Substitua pelo URL do seu frontend
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 };
 
