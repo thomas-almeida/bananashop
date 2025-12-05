@@ -11,7 +11,7 @@ export interface StorePayload {
 
 export const createStore = async (userId: string, storeData: StorePayload) => {
     try {
-        const response = await axios.post(`/stores/${userId}/create`, storeData);
+        const response = await axios.post(`${BASE_URL}/stores/${userId}/create`, storeData);
         return response.data;
     } catch (error) {
         console.error('Error creating store:', error);
