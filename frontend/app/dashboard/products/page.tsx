@@ -14,7 +14,7 @@ export default function Products() {
     const { products, loading, refetch } = useProducts();
     const [isModalOpen, setModalOpen] = useState(false)
     const [editing, setIsEditing] = useState(false)
-    const [selectedProduct, setSelectedProduct] = useState(0)
+    const [selectedProduct, setSelectedProduct] = useState<any>(null)
     const { user } = useUser();
     console.log(products)
 
@@ -26,16 +26,18 @@ export default function Products() {
         <>
             <div className="px-4">
 
-                <Link
-                    href={"/dashboard"}
-                    className="flex justify-start items-center mb-5"
-                >
-                    <ArrowLeft />
-                    Voltar
-                </Link>
+                <div>
+                    <Link
+                        href={"/dashboard"}
+                        className="flex justify-start items-center mb-5 border border-slate-200 max-w-[100px] p-2 rounded shadow text-lg font-medium gap-2"
+                    >
+                        <ArrowLeft />
+                        Voltar
+                    </Link>
+                </div>
 
                 <div>
-                    <h1 className="text-3xl font-semibold">Produtos</h1>
+                    <h1 className="text-3xl font-semibold">Meus Produtos</h1>
                     <p className="text-neutral-700">Gerencie os produtos da sua loja</p>
                     <Button
                         text="Adicionar"
@@ -128,7 +130,9 @@ export default function Products() {
                 isEditing={editing}
                 product={selectedProduct >= 0 ? products[selectedProduct] : null}
                 onClose={() => {
+                    setIsEditing(false)
                     setModalOpen(false)
+                    setSelectedProduct(null)
                     refetch()
                 }}
                 storeId={user?.store || ""}

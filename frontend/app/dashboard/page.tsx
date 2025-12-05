@@ -10,6 +10,7 @@ import { pageTree } from "@/app/utils/page-tree"
 import { useUser } from "@/hooks/use-user"
 import { useShop } from "@/hooks/use-shop"
 import Button from "../components/form/Button"
+import { SquareArrowOutUpRight } from "lucide-react"
 
 export default function Dashboard() {
     const router = useRouter();
@@ -42,28 +43,26 @@ export default function Dashboard() {
                 <h1 className="text-2xl font-semibold">Olá,{session?.user?.name}</h1>
                 <p className="text-sm text-gray-500">Bora vender!</p>
 
-                <div className="flex justify-start items-center gap-2 p-2 rounded-md my-5 mb-10 border border-gray-200 shadow-md">
-                    <Image
-                        src={store?.image || "/logo.png"}
-                        alt="Avatar"
-                        width={55}
-                        height={55}
-                        className="rounded-full shadow-md border border-gray-400"
-                    />
+                <Link href={`/loja/${store?.name}`}>
+                    <div className="relative flex justify-start items-center gap-2 p-2 rounded-md my-5 mb-10 border border-gray-200 shadow-md">
+                        <Image
+                            src={store?.image || "/logo.png"}
+                            alt="Avatar"
+                            width={55}
+                            height={55}
+                            className="rounded-full shadow-md border border-gray-400"
+                        />
 
-                    <div className="px-2">
-                        <h2 className="text-xl font-semibold">
-                            {store?.name}
-                        </h2>
-                        <Link
-                            className="w-full text-sm text-blue-400 font-medium"
-                            href={`/loja/${store?.name}`}
-                        >
-                            Ver minha loja
-                        </Link>
+                        <div className="px-2">
+                            <h2 className="text-xl font-semibold">
+                                {store?.name}
+                            </h2>
+                            Clique para ver sua loja
+                        </div>
+
+                        <SquareArrowOutUpRight className="absolute top-5 right-4 w-7 h-7 cursor-pointer" />
                     </div>
-                </div>
-
+                </Link>
                 <div className="my-4">
                     <h2 className="text-xl font-semibold my-4">Dashboard</h2>
                     <div>
