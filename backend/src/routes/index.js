@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createUser, getUserById, updateUser } from "../controller/userController.js";
 import { upload, uploadImage } from "../controller/uploadController.js";
+import { withdrawalRequest, getWithdrawsByUserId } from "../controller/withdrawalsController.js";
 import { createTransaction, abacatepayWebhook, updateBalance, getTransactionById } from "../controller/transactionController.js";
 import storeRoutes from "./storeRoutes.js";
 import productRoutes from "./productRoutes.js";
@@ -26,5 +27,9 @@ api.post('/transaction', createTransaction);
 api.get('/transaction/:transactionId', getTransactionById)
 api.put('/transaction/balance', updateBalance)
 api.post('/abacatepay', abacatepayWebhook);
+
+// Saques
+api.post('/withdraw', withdrawalRequest)
+api.get('/withdraw/:userId', getWithdrawsByUserId)
 
 export default api;

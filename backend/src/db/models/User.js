@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
         pixKey: { type: String, default: "" },
         taxId: { type: String, default: "" },
         rate: { type: Number, default: 0.05 }
-    }
+    },
 }, { timestamps: true });
 
 const User = mongoose.model("User", UserSchema);
