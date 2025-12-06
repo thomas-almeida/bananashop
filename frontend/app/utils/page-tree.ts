@@ -13,8 +13,13 @@ export const pageTree = [
         icon: Settings,
     },
     {
+        name: "Meus Saques",
+        href: "/dashboard/withdraw",
+        icon: DollarSign,
+    },
+    {
         name: "Suporte",
-        href: "/dashboard",
+        href: "https://api.whatsapp.com/send?phone=5511949098312&text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20BananaShop",
         icon: MessageCircle,
-    }
+    },
 ]

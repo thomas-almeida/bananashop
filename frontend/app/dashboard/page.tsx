@@ -5,18 +5,20 @@ import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { pageTree } from "@/app/utils/page-tree"
 import { useUser } from "@/hooks/use-user"
 import { useShop } from "@/hooks/use-shop"
 import Button from "../components/form/Button"
-import { SquareArrowOutUpRight } from "lucide-react"
+import { DollarSign, SquareArrowOutUpRight } from "lucide-react"
+import WithdrawModal from "../components/modal/WithdrawModal"
 
 export default function Dashboard() {
     const router = useRouter();
     const { data: session } = useSession()
-    const { user, loading } = useUser()
+    const { user, loading, refetch } = useUser()
     const { store, loading: shopLoading } = useShop()
+    const [modalOpen, setModalOpen] = useState(false)
 
     useEffect(() => {
         // Se não estiver mais carregando, verifica se o usuário tem uma loja
@@ -79,7 +81,7 @@ export default function Dashboard() {
                                     color="primary"
                                     className={`w-full ${!user || user.banking.balance < 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={!user || user.banking.balance < 10}
-                                    onClick={() => console.log("Solicitar saque")}
+                                    onClick={() => setModalOpen(true)}
                                 />
                             </div>
                         </div>
@@ -100,11 +102,21 @@ export default function Dashboard() {
                                     {item.name}
                                 </Link>
                             ))
+
                         }
                     </div>
                 </div>
 
             </div>
+            <WithdrawModal
+                isOpen={modalOpen}
+                onClose={() => {
+                        setModalOpen(false)
+                        refetch()
+                    }
+                }
+                user={user}
+            />
         </>
     )
 }

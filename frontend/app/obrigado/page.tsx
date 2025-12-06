@@ -13,11 +13,13 @@ export default function ThanksPage() {
                         priority
                     />
                     <h1 className="max-w-xs text-3xl font-semibold tracking-tight">
-                        Obrigado!
+                        Obrigado pela compra!
                     </h1>
-                    <p className="max-w-xs text-lg text-zinc-600 leading-5 mt-4">
-                        Obrigado por sua compra! em instantes a loja entrará em contato com você. também enviamos a confirmação do seu pedido via e-mail e whatsapp, fique de olho.
-                    </p>
+                    <div className="mx-5 text-center">
+                        <p className="text-lg text-zinc-900 leading-5 mt-4">
+                            Verifique seu e-mail pois te enviamos o comprovante por lá! A loja já está ciente do seu pedido e entrará em contato com você em instantes.
+                        </p>
+                    </div>
                 </div>
             </main>
         </div>

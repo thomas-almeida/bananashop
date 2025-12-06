@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import { getUser } from "@/app/service/userService";
 
@@ -22,29 +22,35 @@ export function useUser() {
     const [loading, setLoading] = useState(true);
     const { data: session } = useSession();
 
-    useEffect(() => {
-        async function fetchUser() {
-            const userId = session?.user?.id;
+    const fetchUser = useCallback(async () => {
+        const userId = session?.user?.id;
 
-            if (!userId) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const userData = await getUser(userId);
-                localStorage.setItem("userStore", JSON.stringify(userData));
-                setUser(userData);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-                setLoading(false);
-            } finally {
-                setLoading(false);
-            }
+        if (!userId) {
+            setLoading(false);
+            return null;
         }
 
-        fetchUser();
-    }, [session]);
+        setLoading(true);
+        try {
+            const userData = await getUser(userId);
+            localStorage.setItem("userStore", JSON.stringify(userData));
+            setUser(userData);
+            return userData;
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    }, [session?.user?.id]);
 
-    return { user, loading };
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
+
+    const refetch = useCallback(async () => {
+        return fetchUser();
+    }, [fetchUser]);
+
+    return { user, loading, refetch };
 }
