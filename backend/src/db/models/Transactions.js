@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema({
     productId: { type: String, required: true },
+    store: { type: String, required: true },
     quantity: { type: Number, default: 0 },
     value: { type: Number, default: 0 },
     rate: { type: Number, default: 0 },

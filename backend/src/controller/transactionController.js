@@ -1,4 +1,5 @@
 import Transaction from "../db/models/Transactions.js";
+import User from "../db/models/User.js";
 import axios from "axios";
 import { notifyPaymentUpdate } from "../socket/index.js";
 export const createTransaction = async (req, res) => {
@@ -46,6 +47,58 @@ export const createTransaction = async (req, res) => {
     }
 };
 
+export const getTransactionById = async (req, res) => {
+
+    const { transactionId } = req.params
+
+    try {
+
+        const transaction = await Transaction.findById(transactionId)
+
+        if (!transaction) {
+            return res.status(404).json({ error: "Transaction not found" })
+        }
+
+        res.status(200).json(transaction)
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: error.message })
+    }
+}
+
+export const updateBalance = async (req, res) => {
+    try {
+
+        const { storeId, transactionId } = req.body
+
+        const user = await User.findOne({ store: storeId });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const transaction = await Transaction.findById(transactionId);
+
+        if (!transaction) {
+            return res.status(404).json({ error: "Transaction not found" });
+        }
+
+        if (transaction.status !== "PAID") {
+            return res.status(400).json({ error: "Transaction not paid yet" });
+        }
+
+        const realDiscount = transaction.value * user.banking.rate;
+        user.banking.balance += transaction.value - realDiscount;
+
+        await user.save();
+        res.status(200).json({ message: "Balance updated successfully" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
 
 export const abacatepayWebhook = async (req, res) => {
     try {
