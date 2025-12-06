@@ -37,7 +37,7 @@ export const productsSchema = z.object({
 export const bankingSchema = z.object({
     taxID: z.string().min(11, "CPF inválido"),
     pixKey: z.string().min(5, "Campo obrigatório"),
-    payoutMethod: z.enum(["IMEDIATO", "SEMANAL", "MENSAL"]),
+    payoutMethod: z.string(),
 });
 
 export const fullSchema = storeSchema.merge(productsSchema).merge(bankingSchema);

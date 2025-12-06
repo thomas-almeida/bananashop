@@ -59,3 +59,40 @@ export const getStoreByName = async (storeName: string) => {
         throw error;
     }
 };
+
+export interface ViaCepResponse {
+    cep: string;
+    logradouro: string;
+    complemento: string;
+    bairro: string;
+    localidade: string;
+    uf: string;
+    ibge: string;
+    gia: string;
+    ddd: string;
+    siafi: string;
+    erro?: boolean;
+}
+
+export const searchCep = async (cep: string): Promise<ViaCepResponse> => {
+    try {
+        // Remove qualquer caractere que não seja número
+        const cleanedCep = cep.replace(/\D/g, '');
+        console.log(cleanedCep)
+
+        if (cleanedCep.length !== 8) {
+            throw new Error('CEP deve conter 8 dígitos');
+        }
+
+        const response = await axios.get(`https://viacep.com.br/ws/${cleanedCep}/json/`);
+        
+        if (response.data.erro) {
+            throw new Error('CEP não encontrado');
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+        throw error;
+    }
+};

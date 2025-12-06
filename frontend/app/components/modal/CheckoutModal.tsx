@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomerCheckoutFormData, customerCheckoutSchema } from "@/app/loja/schemas/checkoutSchema";
 import Input from "../form/Input";
 import { User, Mail, Phone, MapPin, Home, Map, MapPinIcon, Minus, Plus } from "lucide-react";
 import Button from "../form/Button";
 import { createTransaction } from "@/app/service/transactionService";
-import { useRouter } from "next/navigation";
+import { searchCep } from "@/app/service/storeService";
 
 interface TransactionResponse {
     _id: string;
@@ -30,21 +30,27 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, storeId, price, inStorage }: CheckoutModalProps) {
-    const router = useRouter();
+    
     const [quantity, setQuantity] = useState(1);
+    const [isCepLoading, setIsCepLoading] = useState(false);
+
+const methods = useForm<CustomerCheckoutFormData>({
+        resolver: zodResolver(customerCheckoutSchema),
+    });
 
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
         formState: { errors, isSubmitting },
-    } = useForm<CustomerCheckoutFormData>({
-        resolver: zodResolver(customerCheckoutSchema),
-    });
+    } = methods;
 
     const onSubmit = async (data: CustomerCheckoutFormData) => {
         try {
             const transactionData = {
                 productId,
+                store: storeId,
                 quantity,
                 value: price * quantity,
                 customer: {
@@ -80,6 +86,37 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
     const handleModalClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
     };
+
+    // Observa mudanças no CEP e faz a busca quando tiver 8 dígitos
+    const cep = watch('zipCode');
+    
+    useEffect(() => {
+        const fetchCep = async () => {
+            // Remove formatação e verifica se tem 8 dígitos
+            const cleanedCep = cep?.replace(/\D/g, '') || '';
+            if (cleanedCep.length !== 8) return;
+            
+            try {
+                setIsCepLoading(true);
+                const cepData = await searchCep(cleanedCep);
+                
+                // Preenche os campos automaticamente
+                setValue('state', cepData.uf);
+                setValue('city', cepData.localidade);
+                setValue('address', cepData.logradouro);
+                
+                // Foca no campo de número após preencher o endereço
+                document.getElementById('addressNumber')?.focus();
+            } catch (error) {
+                console.error('Erro ao buscar CEP:', error);
+                // Não precisa mostrar erro para o usuário, já que o formulário irá validar
+            } finally {
+                setIsCepLoading(false);
+            }
+        };
+
+        fetchCep();
+    }, [cep, setValue, watch]);
 
     if (!isOpen) return null;
 
@@ -168,12 +205,48 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                                     </button>
                                 </div>
                             </div>
+                            <div className="relative">
+                                <Input
+                                    placeholder="CEP"
+                                    type="text"
+                                    icon={<MapPinIcon className="h-5 w-5 text-gray-400" />}
+                                    {...register("zipCode", {
+                                        onChange: (e) => {
+                                            // Remove tudo que não for número
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            
+                                            // Aplica a máscara (XXXXX-XXX) apenas visual
+                                            let displayValue = value;
+                                            if (value.length > 5) {
+                                                displayValue = `${value.slice(0, 5)}-${value.slice(5, 8)}`;
+                                            } else if (value.length > 0) {
+                                                displayValue = value;
+                                            }
+                                            
+                                            // Atualiza o valor exibido
+                                            e.target.value = displayValue;
+                                            
+                                            // Retorna o valor sem formatação para o formulário
+                                            return value;
+                                        },
+                                        maxLength: 9
+                                    })}
+                                    error={errors.zipCode?.message?.toString()}
+                                    disabled={isCepLoading}
+                                />
+                                {isCepLoading && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                                    </div>
+                                )}
+                            </div>
+
                             <Input
-                                placeholder="CEP"
+                                placeholder="Cidade"
                                 type="text"
-                                icon={<MapPinIcon className="h-5 w-5 text-gray-400" />}
-                                {...register("zipCode")}
-                                error={errors.zipCode}
+                                icon={<MapPin className="h-5 w-5 text-gray-400" />}
+                                {...register("city")}
+                                error={errors.city?.message?.toString()}
                             />
 
                             <Input
@@ -181,25 +254,32 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
                                 type="text"
                                 icon={<Map className="h-5 w-5 text-gray-400" />}
                                 {...register("state")}
-                                error={errors.state}
+                                error={errors.state?.message?.toString()}
                             />
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="md:col-span-2">
+                                    <Input
+                                        placeholder="Endereço"
+                                        type="text"
+                                        icon={<Home className="h-5 w-5 text-gray-400" />}
+                                        {...register("address")}
+                                        error={errors.address?.message?.toString()}
+                                    />
+                                </div>
+                                <div>
+                                    <Input
+                                        id="addressNumber"
+                                        placeholder="Número"
+                                        type="text"
+                                        {...register("addressNumber")}
+                                        error={errors.addressNumber?.message?.toString()}
+                                    />
+                                </div>
+                            </div>
+
                         </div>
 
-                        <Input
-                            placeholder="Cidade"
-                            type="text"
-                            icon={<MapPin className="h-5 w-5 text-gray-400" />}
-                            {...register("city")}
-                            error={errors.city}
-                        />
-
-                        <Input
-                            placeholder="Endereço"
-                            type="text"
-                            icon={<Home className="h-5 w-5 text-gray-400" />}
-                            {...register("address")}
-                            error={errors.address}
-                        />
 
                         <div className="mt-4 pt-4 border-t border-gray-200">
                             <div className="flex justify-between items-center mb-4">

@@ -10,6 +10,16 @@ export interface createProductPayload {
     inStorage: number;
 }
 
+export interface ProductData {
+    name: string;
+    price: number;
+    description: string;
+    brand?: string;
+    images: string[];
+    inStorage: number;
+    store: string;
+}
+
 export const getProductsByStore = async (storeId: string) => {
     try {
         const response = await axios.get(`${BASE_URL}/products/${storeId}`);
@@ -36,6 +46,21 @@ export const createProduct = async (storeId: string, payload: createProductPaylo
         return response.data;
     } catch (error) {
         console.error('Error creating product:', error);
+        throw error;
+    }
+}
+
+export const searchCustomerPostalCode = async (postalCode: number) => {
+    try {
+        const response = await axios.get(`viacep.com.br/ws/${postalCode}/json/`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error searching customer postal code:', error);
         throw error;
     }
 }

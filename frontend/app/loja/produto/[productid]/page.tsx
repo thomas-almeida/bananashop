@@ -284,6 +284,7 @@ export default function ProductPage() {
                         pixCode={pixData.code}
                         expiresIn={pixData.expiresIn}
                         transactionId={pixData.transactionId}
+                        storeId={product.store}
                     />
                 </>
             ) : (

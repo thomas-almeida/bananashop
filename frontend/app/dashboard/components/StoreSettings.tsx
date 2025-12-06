@@ -128,7 +128,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                             Logo da Loja
                         </label>
                         {preview ? (
-                            <div className="relative w-40 h-40">
+                            <div className="relative w-40 h-40 max-w-40 max-h-40">
                                 <img
                                     src={preview}
                                     alt="Logo da loja"

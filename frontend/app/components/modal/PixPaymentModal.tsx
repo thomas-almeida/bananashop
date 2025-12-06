@@ -6,6 +6,7 @@ import { X, Copy, Check, Clock } from 'lucide-react';
 import Button from '../form/Button';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { updateBalance } from '@/app/service/transactionService';
 
 interface PaymentUpdatePayload {
   status: string;
@@ -21,10 +22,11 @@ interface PixPaymentModalProps {
   pixId: string;
   pixCode: string;
   expiresIn: number;
-  transactionId: string; // em segundos
+  transactionId: string;
+  storeId: string;
 }
 
-export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, pixId, transactionId, expiresIn = 120 }: PixPaymentModalProps) {
+export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, storeId, transactionId, expiresIn = 120 }: PixPaymentModalProps) {
   const [isCopied, setIsCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState(expiresIn); // tempo em segundos
   const [status, setStatus] = useState("PENDING");
@@ -66,12 +68,15 @@ export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, pixI
     });
 
     // Escuta por atualizações de pagamento
-    const handlePaymentUpdate = (payload: PaymentUpdatePayload) => {
+    const handlePaymentUpdate = async (payload: PaymentUpdatePayload) => {
       console.log('💰 Evento de pagamento recebido:', payload);
 
       if (payload.transactionId === transactionId) {
         console.log('✅ Pagamento atualizado:', payload.status);
         setStatus(payload?.status);
+
+        await updateBalance(storeId, payload.transactionId)
+
         setTimeout(() => {
           redirect.push("/obrigado")
         }, 3000)

@@ -50,7 +50,7 @@ export default function Dashboard() {
                             alt="Avatar"
                             width={55}
                             height={55}
-                            className="rounded-full shadow-md border border-gray-400"
+                            className="rounded-full shadow-md border border-gray-400 object-cover max-w-[]"
                         />
 
                         <div className="px-2">

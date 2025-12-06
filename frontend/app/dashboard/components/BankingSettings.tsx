@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { bankingSchema } from '@/app/onboarding/schemas/onboardingSchema';
-import { useUser } from '@/hooks/use-user';
+import { updateUser } from '@/app/service/userService';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
@@ -12,17 +12,16 @@ import Input from '../../components/form/Input';
 import Button from '../../components/form/Button';
 
 // Definindo o tipo para os métodos de pagamento
-type PayoutMethod = 'IMEDIATO' | 'SEMANAL' | 'MENSAL';
 
 // Mapeamento entre taxas e métodos de pagamento
-const RATE_TO_METHOD: { [key: number]: PayoutMethod } = {
+const RATE_TO_METHOD: { [key: number]: string } = {
     0.05: 'IMEDIATO',
     0.03: 'SEMANAL',
     0.015: 'MENSAL'
 };
 
 // Mapeamento reverso para obter a taxa a partir do método
-const METHOD_TO_RATE: { [key in PayoutMethod]: number } = {
+const METHOD_TO_RATE: { [key in string]: number } = {
     'IMEDIATO': 0.05,
     'SEMANAL': 0.03,
     'MENSAL': 0.015
@@ -35,25 +34,24 @@ export default function BankingSettings({ user }: { user: any }) {
     const [isLoading, setIsLoading] = useState(false);
 
     // Determina o método de pagamento com base na taxa atual
-    const getCurrentPayoutMethod = (): PayoutMethod => {
+    const getCurrentPayoutMethod = () => {
         if (!user?.banking) return 'IMEDIATO';
         return RATE_TO_METHOD[user.banking.rate] || 'IMEDIATO';
     };
 
-    const [selected, setSelected] = useState<PayoutMethod>(getCurrentPayoutMethod());
+    const [selected, setSelected] = useState<string>(getCurrentPayoutMethod());
 
     const {
         register,
         handleSubmit,
-        setValue,
         reset,
-        watch,
         formState: { errors },
     } = useForm<BankingForm>({
         resolver: zodResolver(bankingSchema),
         defaultValues: {
             taxID: user?.banking?.taxId || '',
             pixKey: user?.banking?.pixKey || '',
+            payoutMethod: selected
         },
     });
 
@@ -70,59 +68,72 @@ export default function BankingSettings({ user }: { user: any }) {
         }
     }, [user]);
 
-    const handleSelect = (option: PayoutMethod) => {
+    const handleSelect = (option: string) => {
         setSelected(option);
-        // Não precisamos mais definir o valor no formulário, já que usamos o estado local
+        // Atualiza o valor do formulário quando a seleção mudar
+        reset({
+            taxID: user?.banking?.taxId || '',
+            pixKey: user?.banking?.pixKey || '',
+            payoutMethod: option
+        }, { keepDefaultValues: true });
     };
 
     const onSubmit = async (data: BankingForm) => {
-        if (!session?.user?.id) return;
+
+
+        if (!session?.user?.id) {
+            console.error('ID do usuário não encontrado na sessão');
+            return;
+        }
 
         setIsLoading(true);
 
         try {
-            // Aqui você implementaria a lógica para salvar os dados
-            // Incluindo a taxa baseada no método selecionado
             const rate = METHOD_TO_RATE[selected];
             console.log('Dados a serem salvos:', {
                 ...data,
-                rate
+                rate,
+                userId: session.user.id
             });
 
-            // Exemplo de como seria a chamada à API:
-            // await updateBankingData(session.user.id, {
-            //     taxId: data.taxID,
-            //     pixKey: data.pixKey,
-            //     rate: rate
-            // });
-
+            await updateUser(session.user.id, {
+                taxId: data.taxID,
+                pixKey: data.pixKey,
+                rate,
+            })
+            
             toast.success('Dados bancários atualizados com sucesso!');
         } catch (error) {
             console.error('Erro ao salvar dados bancários:', error);
-            toast.error('Erro ao salvar dados bancários');
+            toast.error('Erro ao salvar dados bancários. Por favor, tente novamente.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const calcularValorLiquido = (tipo: PayoutMethod) => {
-        const valorVenda = 1000; // Valor de exemplo para cálculo
-        if (tipo === 'IMEDIATO') return `R$${(valorVenda * 0.95).toFixed(2).replace('.', ',')}`;
-        if (tipo === 'SEMANAL') return `R$${(valorVenda * 0.97).toFixed(2).replace('.', ',')}`;
-        return `R$${(valorVenda * 0.99).toFixed(2).replace('.', ',')}`;
+    const calcularValorLiquido = (tipo: string) => {
+        const discount = METHOD_TO_RATE[tipo];
+        const liquidValue = 100 - (100 * discount);
+        return liquidValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     };
 
     return (
         <div>
             <h2 className="text-xl font-semibold mb-6">Dados Bancários</h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-6"
+            >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input
                         label="CPF"
                         type="text"
                         placeholder="000.000.000-00"
-                        {...register('taxID')}
+                        {...register('taxID', {
+                            required: 'CPF é obrigatório',
+                        })}
+                        error={errors.taxID?.message}
                     />
 
                     <Input
@@ -130,38 +141,40 @@ export default function BankingSettings({ user }: { user: any }) {
                         type="text"
                         placeholder="Sua chave PIX"
                         {...register('pixKey')}
+                        error={errors.pixKey?.message}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Método de Pagamento
+                    <label className="block text-xl font-semibold mb-4">
+                        Sua Modalidade de Saque
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {(['IMEDIATO', 'SEMANAL', 'MENSAL'] as const).map((option) => {
                             const isSelected = selected === option;
                             const rate = METHOD_TO_RATE[option];
-                            const ratePercentage = (rate * 100).toFixed(0);
+                            const ratePercentage = (rate * 100);
 
                             return (
                                 <div
                                     key={option}
                                     onClick={() => handleSelect(option)}
-                                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${isSelected
-                                            ? 'border-green-500 bg-green-50'
-                                            : 'border-gray-200 hover:border-gray-300'
+                                    className={`p-4 relative border rounded-lg cursor-pointer transition-colors ${isSelected
+                                        ? 'border-green-500 bg-green-50'
+                                        : 'border-gray-200 hover:border-gray-300'
                                         }`}
                                 >
                                     <div className="font-medium">
-                                        {option === 'IMEDIATO' && 'Pagamento Imediato'}
-                                        {option === 'SEMANAL' && 'Pagamento Semanal'}
-                                        {option === 'MENSAL' && 'Pagamento Mensal'}
+                                        {option === 'IMEDIATO' && 'Repasse Imediato'}
+                                        {option === 'SEMANAL' && 'Repasse Semanal'}
+                                        {option === 'MENSAL' && 'Repasse Mensal'}
                                     </div>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="absolute top-1.5 right-2 text-md border border-slate-300 px-2 p-0.5 max-w-[100px] text-center rounded-full">
                                         Taxa: {ratePercentage}%
                                     </div>
                                     <div className="text-sm font-medium mt-1">
-                                        {calcularValorLiquido(option)} líquidos
+                                        Exemplo: você recebe <b className="text-green-700">{calcularValorLiquido(option)}</b> líquidos numa venda de R$ 100,00
+
                                     </div>
                                 </div>
                             );
