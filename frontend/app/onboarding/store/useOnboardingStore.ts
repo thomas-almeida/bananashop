@@ -41,7 +41,7 @@ export const useOnboardingStore = create<OnboardingState>()(
             step: 1,
             store: { storeName: "", description: "", instagram: "", whatsapp: "" },
             products: { csvFile: null, products: [] },
-            banking: { taxID: "", pixKey: "", rate: "IMEDIATO", simulationValue: 0 },
+            banking: { taxID: "", pixKey: "", rate: 'IMEDIATO', simulationValue: 0 },
             setStep: (step) => set({ step }),
             setStore: (data) => set((state) => ({ store: { ...state.store, ...data } })),
             setProducts: (data) => set((state) => ({ products: { ...state.products, ...data } })),
@@ -49,9 +49,9 @@ export const useOnboardingStore = create<OnboardingState>()(
             reset: () =>
                 set({
                     step: 1,
-                    store: { storeName: "", description: "", instagram: "", whatsapp: "", logo: ""},
+                    store: { storeName: "", description: "", instagram: "", whatsapp: "", logo: "" },
                     products: { csvFile: null, products: [] },
-                    banking: { taxID: "", pixKey: "", rate: "IMEDIATO" },
+                    banking: { taxID: "", pixKey: "", rate: 'IMEDIATO' },
                 }),
         }),
         { name: "onboarding-storage" }
