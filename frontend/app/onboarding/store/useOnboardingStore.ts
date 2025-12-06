@@ -20,7 +20,7 @@ interface ProductsData {
 interface BankingData {
     taxID: string;
     pixKey: string;
-    rate: "IMEDIATO" | "SEMANAL" | "MENSAL";
+    rate: string;
 }
 
 interface OnboardingState {
