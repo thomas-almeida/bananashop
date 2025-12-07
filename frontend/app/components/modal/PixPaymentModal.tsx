@@ -69,11 +69,6 @@ export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, stor
 
     // Escuta tanto o evento específico quanto o global (para debug)
     socketRef.current.on('payment-update', handlePaymentUpdate);
-    socketRef.current.on('payment-update-global', (payload) => {
-      if (payload.transactionId === transactionId) {
-        handlePaymentUpdate(payload);
-      }
-    });
 
     // Tratamento de erros
     socketRef.current.on('connect_error', (err) => {

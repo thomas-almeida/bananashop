@@ -3,6 +3,8 @@ import User from "../db/models/User.js";
 import Product from "../db/models/Products.js";
 import axios from "axios";
 import { notifyPaymentUpdate } from "../socket/index.js";
+import { sellerSoldTemplate, customerBuyTemplate } from "../../utils/mail-templates.js";
+
 export const createTransaction = async (req, res) => {
     try {
 
@@ -99,8 +101,31 @@ export const updateBalance = async (req, res) => {
         user.banking.balance += transaction.value - realDiscount;
         product.inStorage -= 1;
 
+
+        const sellerMailPayload = {
+            accountId: process.env.ZOHO_ACCOUNT_ID,
+            fromAddress: "Suporte BananaShop <thomas.rodrigues@bananasend.top>",
+            toAddress: user.email, // Email do vendedor
+            subject: `Parabéns ${user.username}, você vendeu!`,
+            content: sellerSoldTemplate(user, transaction, product).content,
+            userId: process.env.BANANASEND_USERID
+        }
+
+        const customerMailPayload = {
+            accountId: process.env.ZOHO_ACCOUNT_ID,
+            fromAddress: "Suporte BananaShop <thomas.rodrigues@bananasend.top>",
+            toAddress: transaction.customer.email, // Email do comprador
+            subject: `${transaction.customer.name}, Parabéns pela sua compra!`,
+            content: customerBuyTemplate(transaction, product).content,
+            userId: process.env.BANANASEND_USERID
+        }
+
+        await axios.post(`${process.env.BANANASEND_BASEURL}/zoho/send-mail`, sellerMailPayload);
+        await axios.post(`${process.env.BANANASEND_BASEURL}/zoho/send-mail`, customerMailPayload);
+
         await user.save();
         await product.save();
+
         res.status(200).json({ message: "Balance updated successfully" });
 
     } catch (error) {
@@ -161,3 +186,4 @@ export const abacatepayWebhook = async (req, res) => {
         return res.sendStatus(500);
     }
 };
+

@@ -130,7 +130,7 @@ export default function ProductPage() {
                             <div className="w-full max-w-2xl mx-auto mb-4 relative">
                                 <div>
                                     <Link
-                                        href={`/loja/${storeInfo?.name}`}
+                                        href={`/loja/${storeInfo?.normalizedName}`}
                                         className="py-4 text-center flex justify-center gap-2 items-center"
                                     >
                                         {
