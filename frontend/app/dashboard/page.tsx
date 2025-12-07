@@ -45,7 +45,7 @@ export default function Dashboard() {
                 <h1 className="text-2xl font-semibold">Olá,{session?.user?.name}</h1>
                 <p className="text-sm text-gray-500">Bora vender!</p>
 
-                <Link href={`/loja/${store?.name}`}>
+                <Link href={`/loja/${store?.normalizedName}`}>
                     <div className="relative flex justify-start items-center gap-2 p-2 rounded-md my-5 mb-10 border border-gray-200 shadow-md">
                         <Image
                             src={store?.image || "/logo.png"}

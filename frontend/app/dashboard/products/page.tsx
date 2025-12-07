@@ -16,8 +16,7 @@ export default function Products() {
     const [editing, setIsEditing] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<any>(null)
     const { user } = useUser();
-    console.log(products)
-
+    
     if (loading) {
         return <div className="px-4">Carregando produtos...</div>;
     }

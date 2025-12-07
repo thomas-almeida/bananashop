@@ -81,9 +81,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
         setValue('logo', '');
         setPreview(null);
     };
-
-    console.log(user)
-
+    
     const onSubmit = async (data: StoreForm) => {
         if (!session?.user?.id) return;
 

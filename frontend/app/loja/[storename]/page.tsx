@@ -1,8 +1,9 @@
 "use client"
 
 import Button from "@/app/components/form/Button";
-import { Loader2, Mail, MessageCircle } from "lucide-react";
+import { Loader2, Mail, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useShop } from "@/hooks/use-shop";
 import ProductItem from "@/app/components/products/productItem";
@@ -12,11 +13,14 @@ import Footer from "@/app/components/Footer";
 export default function Store() {
     const { storename } = useParams();
     const { publicStore, loading } = useShop(storename as string);
+    const [openAccordion, setOpenAccordion] = useState<number | null>(null);
 
-    console.log("Store data:", publicStore);
+    const toggleAccordion = (index: number) => {
+        setOpenAccordion(openAccordion === index ? null : index);
+    };
 
 
-    if (loading) {
+    if (loading || !publicStore) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <Image src={"/logo.png"} width={80} height={80} alt="logo" priority className="animate-pulse" />
@@ -82,7 +86,7 @@ export default function Store() {
                         <h2 className="text-xl font-semibold my-4">Produtos</h2>
                         <div>
                             {
-                                publicStore?.products?.length! > 0 ? (
+                                publicStore?.products?.length! > 0 && (
                                     <>
                                         <div className="grid grid-cols-1 gap-4">
 
@@ -94,16 +98,84 @@ export default function Store() {
 
                                         </div>
                                     </>
-                                ) : (
-                                    <>
-                                        <p className="text-gray-500 text-center">Aguarde...</p>
-                                    </>
+                                )
+
+                            }
+
+                            {
+                                publicStore.products?.length! === 0 && (
+                                    <p className="text-gray-500 text-center">Esta loja ainda não tem produtos</p>
                                 )
                             }
 
                         </div>
                     </div>
-                    <Footer />
+
+                    <div className="mt-8 w-full max-w-2xl">
+                        <h3 className="text-lg font-bold mb-4">Dúvidas de como comprar:</h3>
+                        <div className="space-y-2">
+                            {[
+                                {
+                                    question: "Como vou receber minha entrega?",
+                                    answer: "Após a confirmação do pagamento, você e a loja receberão a confirmação do pedido onde a loja entrará em contato com você para realizar a entrega."
+                                },
+                                {
+                                    question: "O que acontece após o pagamento? estou protegido?",
+                                    answer: "Após a confirmação do pagamento,vcoê e a loja recebem a confirmação, a loja entrará em contato com você para ajustar a entrega do produto. não se preocupe, caso algo dê errado seu reembolso poderá ser realizado normalmente"
+                                },
+                                {
+                                    question: "Existe garantia?",
+                                    answer: "Sim, existe garantia de 7 dias, caso o produto não atenda às expectativas ou não seja entregue, você poderá solicitar o reembolso normalmente."
+                                },
+                                {
+                                    question: "Como falo com a loja?",
+                                    answer: (
+                                        <>
+                                            Caso precise de ajuda ou tenha mais perguntas você pode entrar em contato direto com este perfil:
+                                            <Link href={""} className="block mt-2">
+                                                <Button
+                                                    text="Falar com a loja"
+                                                    color="secondary"
+                                                    className="my-2"
+                                                />
+                                            </Link>
+                                        </>
+                                    )
+                                }
+                            ].map((item, index) => (
+                                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                                    <button
+                                        className="w-full px-4 py-3 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                                        onClick={() => toggleAccordion(index)}
+                                        aria-expanded={openAccordion === index}
+                                        aria-controls={`accordion-content-${index}`}
+                                    >
+                                        <span className="font-medium text-gray-900">{item.question}</span>
+                                        {openAccordion === index ? (
+                                            <ChevronUp className="h-5 w-5 text-gray-500" />
+                                        ) : (
+                                            <ChevronDown className="h-5 w-5 text-gray-500" />
+                                        )}
+                                    </button>
+                                    <div
+                                        id={`accordion-content-${index}`}
+                                        className={`px-4 overflow-hidden transition-all duration-300 ${openAccordion === index ? 'max-h-96 py-4' : 'max-h-0'}`}
+                                        aria-hidden={openAccordion !== index}
+                                    >
+                                        <div className="text-gray-600 pb-2">
+                                            {item.answer}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {
+                        publicStore?.products.length > 0 && (
+                            <Footer />
+                        )
+                    }
                 </div>
             </div>
         </>

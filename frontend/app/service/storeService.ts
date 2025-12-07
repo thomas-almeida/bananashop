@@ -78,8 +78,7 @@ export const searchCep = async (cep: string): Promise<ViaCepResponse> => {
     try {
         // Remove qualquer caractere que não seja número
         const cleanedCep = cep.replace(/\D/g, '');
-        console.log(cleanedCep)
-
+        
         if (cleanedCep.length !== 8) {
             throw new Error('CEP deve conter 8 dígitos');
         }

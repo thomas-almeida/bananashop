@@ -90,12 +90,6 @@ export default function BankingSettings({ user }: { user: any }) {
 
         try {
             const rate = METHOD_TO_RATE[selected];
-            console.log('Dados a serem salvos:', {
-                ...data,
-                rate,
-                userId: session.user.id
-            });
-
             await updateUser(session.user.id, {
                 taxId: data.taxID,
                 pixKey: data.pixKey,

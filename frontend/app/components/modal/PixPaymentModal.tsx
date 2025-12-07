@@ -37,8 +37,6 @@ export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, stor
   useEffect(() => {
     if (!transactionId) return;
 
-    console.log('🔌 Iniciando conexão WebSocket para transação:', transactionId);
-
     // Configuração do Socket.IO
     socketRef.current = io('https://bananashop.onrender.com', {
       path: '/socket.io', // Importante: deve ser igual ao configurado no backend
@@ -50,29 +48,15 @@ export default function PixPaymentModal({ isOpen, onClose, qrCode, pixCode, stor
       rejectUnauthorized: false // Apenas para desenvolvimento
     });
 
-    // Log de eventos para debug
-    const events = ['connect', 'disconnect', 'error', 'connect_error', 'reconnect_attempt', 'reconnect'];
-    events.forEach(event => {
-      socketRef.current?.on(event, (arg) => {
-        console.log(`🔌 Socket ${event}:`, arg || 'No data');
-      });
-    });
-
     // Evento de conexão estabelecida
     socketRef.current.on('connect', () => {
-      console.log('✅ Conectado ao servidor WebSocket. ID:', socketRef.current?.id);
-
-      // Entra na sala específica da transação
-      console.log('👀 Assinando transação:', transactionId);
       socketRef.current?.emit('watch-transaction', transactionId);
     });
 
     // Escuta por atualizações de pagamento
     const handlePaymentUpdate = async (payload: PaymentUpdatePayload) => {
-      console.log('💰 Evento de pagamento recebido:', payload);
 
       if (payload.transactionId === transactionId) {
-        console.log('✅ Pagamento atualizado:', payload.status);
         setStatus(payload?.status);
 
         await updateBalance(storeId, payload.transactionId)

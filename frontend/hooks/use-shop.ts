@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 
 type Store = {
     name: string;
+    normalizedName: string;
     description: string;
     image: string;
     publicLink: string;

@@ -58,8 +58,7 @@ export default function WithdrawModal({ user, isOpen, onClose }: WithdrawModalPr
                 userId: user?._id,
                 storeId: user?.store
             }
-
-            console.log(payload)
+            
             const response = await createWithdrawal(payload)
             toast.success(response?.data?.message || 'Saque solicitado com sucesso')
             setTimeout(() => {
