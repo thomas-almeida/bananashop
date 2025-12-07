@@ -223,7 +223,7 @@ export default function ProductPage() {
                                             answer: (
                                                 <>
                                                     Caso precise de ajuda ou tenha mais perguntas você pode entrar em contato direto com este perfil:
-                                                    <Link href={""} className="block mt-2">
+                                                    <Link href={`https://api.whatsapp.com/send?phone=55${storeInfo?.whatsappNumber}&text=Olá%2C%20vi%20sua%20loja%20no%20bananashop!%20🍌`} className="block mt-2">
                                                         <Button
                                                             text="Falar com a loja"
                                                             color="secondary"
