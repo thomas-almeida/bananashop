@@ -23,10 +23,11 @@
     "framer-motion": "^12.23.24",
     "lucide": "^0.548.0",
     "lucide-react": "^0.548.0",
-    "next": "16.0.1",
+    "next": "16.0.7",
     "next-auth": "^4.24.13",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "react-server-dom-webpack": "19.2.1",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.65.0",
     "react-qr-code": "^2.0.18",
@@ -41,10 +42,11 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
+    "@typescript-eslint/parser": "^7.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
