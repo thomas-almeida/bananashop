@@ -18,8 +18,15 @@ export const createStore = async (req, res) => {
         }
 
         // Cria a loja
+        const normalizedName = name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+
         const store = new Store({
             name,
+            normalizedName,
             description,
             igNickname,
             image: image || "",
@@ -109,9 +116,16 @@ export const getStoreById = async (req, res) => {
 export const getStoreByName = async (req, res) => {
     try {
         const { storeName } = req.params;
+        
+        // Normaliza o nome da loja para busca (mesmo processo usado no modelo)
+        const normalizedSearch = storeName
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
 
         const store = await Store.findOne({
-            name: storeName
+            normalizedName: normalizedSearch
         })
             .populate('products', 'name price images description inStorage')
             .populate('owner', 'username email')
@@ -158,6 +172,15 @@ export const updateStore = async (req, res) => {
                 updatesToApply[key] = updates[key];
             }
         });
+
+        // Se o nome for atualizado, atualiza também o normalizedName
+        if (updatesToApply.name) {
+            updatesToApply.normalizedName = updatesToApply.name
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '');
+        }
 
         // Atualiza a loja
         const store = await Store.findByIdAndUpdate(
