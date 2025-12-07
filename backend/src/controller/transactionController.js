@@ -1,5 +1,6 @@
 import Transaction from "../db/models/Transactions.js";
 import User from "../db/models/User.js";
+import Product from "../db/models/Products.js";
 import axios from "axios";
 import { notifyPaymentUpdate } from "../socket/index.js";
 export const createTransaction = async (req, res) => {
@@ -88,10 +89,18 @@ export const updateBalance = async (req, res) => {
             return res.status(400).json({ error: "Transaction not paid yet" });
         }
 
+        const product = await Product.findById(transaction.productId);
+
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
         const realDiscount = transaction.value * user.banking.rate;
         user.banking.balance += transaction.value - realDiscount;
+        product.inStorage -= 1;
 
         await user.save();
+        await product.save();
         res.status(200).json({ message: "Balance updated successfully" });
 
     } catch (error) {
