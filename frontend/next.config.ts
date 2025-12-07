@@ -1,12 +1,20 @@
 const nextConfig = {
   images: {
-    domains: [
-      'lh3.googleusercontent.com',
-      'res.cloudinary.com',
-      'api.qrserver.com'
-    ]
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.qrserver.com',
+      },
+    ],
   },
-
 };
 
 export default nextConfig;
