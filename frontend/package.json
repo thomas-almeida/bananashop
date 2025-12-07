@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "preinstall": "npx npm-force-resolutions"
+    "lint": "eslint"
   },
   "resolutions": {
     "@auth/core": "0.34.2"
