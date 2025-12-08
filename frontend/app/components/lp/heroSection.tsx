@@ -32,7 +32,7 @@ export function HeroSection() {
 
         // Tenta dar play após um pequeno atraso para garantir que o vídeo esteja pronto
         const timer = setTimeout(playVideo, 100);
-        
+
         return () => clearTimeout(timer);
     }, []);
 
@@ -56,9 +56,8 @@ export function HeroSection() {
                     Transforme seu Instagram em uma loja completa
                 </h1>
 
-                <p className="text-[13px] leading-4 font-medium text-center px-10 mb-4">
-                    Em menos de <span className="font-semibold">5 minutos</span>, traga toda geração de vendas na sua bio do
-                    Instagram e venda no automático direto no <span className="font-semibold">Pix</span>
+                <p className="text-[15px] leading-4 text-center px-5 mb-4">
+                    Uma plataforma onde você pode criar um <strong>linktree</strong> dos seus produtos, permitindo vendas diretas via <strong>PIX</strong>, sem ficar combinando valores na sua DM e perdendo vendas.
                 </p>
 
                 <div className="px-10">

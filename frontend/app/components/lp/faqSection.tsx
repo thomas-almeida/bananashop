@@ -22,9 +22,9 @@ export function FaqSection() {
             <div className="space-y-2">
                 {[
                     {
-                        question: "O que é o Bananashop? E pra mim?",
+                        question: "O que é o Bananashop? é pra mim?",
                         answer:
-                            "O Bananashop é uma plataforma que transforma seu Instagram em uma loja completa, permitindo vendas diretas via PIX.",
+                            "O Bananashop é uma plataforma onde você pode criar um linktree dos seus produtos, permitindo vendas diretas via PIX, sem ficar combinando valores na sua DM e perdendo vendas.",
                     },
                     {
                         question: "Como sei quem comprou de mim?",
