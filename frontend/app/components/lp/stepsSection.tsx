@@ -1,8 +1,45 @@
+'use client'
 
 import Image from "next/image"
-import { number } from "zod"
+import { useRef, useEffect } from "react"
 
 export function StepsSection() {
+    const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+
+    // Inicializa a referência para cada vídeo
+    const setVideoRef = (el: HTMLVideoElement | null, index: number) => {
+        videoRefs.current[index] = el
+    }
+
+    useEffect(() => {
+        // Função para tentar dar play nos vídeos
+        const playVideos = async () => {
+            videoRefs.current.forEach(async (video) => {
+                if (video) {
+                    try {
+                        // Tenta dar play imediatamente
+                        await video.play().catch(() => {
+                            // Se falhar, tenta novamente na primeira interação
+                            const handleFirstInteraction = () => {
+                                video.play().catch(console.error)
+                                document.removeEventListener('click', handleFirstInteraction)
+                                document.removeEventListener('touchstart', handleFirstInteraction)
+                            }
+                            document.addEventListener('click', handleFirstInteraction)
+                            document.addEventListener('touchstart', handleFirstInteraction)
+                        })
+                    } catch (err) {
+                        console.error('Erro ao reproduzir vídeo:', err)
+                    }
+                }
+            })
+        }
+
+        // Tenta dar play após um pequeno atraso
+        const timer = setTimeout(playVideos, 100)
+        return () => clearTimeout(timer)
+    }, [])
+
     const steps = [
         {
             number: 1,
@@ -13,15 +50,13 @@ export function StepsSection() {
         {
             number: 2,
             title: "Traga sua chave PIX",
-            description:
-                "Insira a chave pix para receber pagamentos de forma rápida. O bananashop é a melhor forma de recebê-los",
+            description: "Insira a chave pix para receber pagamentos de forma rápida. O bananashop é a melhor forma de recebê-los",
             color: "text-[#22C55E]",
         },
         {
             number: 3,
             title: "Traga seus produtos",
-            description:
-                "Inde seus produtos e comece a compartilhar o link na sua loja na sua bio, agora seus clientes podem comprar direto na sua página",
+            description: "Adicione seus produtos e comece a compartilhar o link na sua bio. Seus clientes podem comprar direto na sua página",
             color: "text-[#22C55E]",
         },
     ]
@@ -37,19 +72,22 @@ export function StepsSection() {
                 </p>
 
                 <div className="space-y-5">
-                    {steps.map((step) => (
-                        <div key={step.number} className="       bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                            <div className="">
+                    {steps.map((step, index) => (
+                        <div key={step.number} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                            <div className="relative">
                                 <video
+                                    ref={(el) => setVideoRef(el, index)}
                                     src={`/video/${step.number}.mp4`}
                                     className="w-full my-4 rounded-lg shadow-lg border border-slate-300"
                                     autoPlay
                                     muted
                                     loop
+                                    playsInline
+                                    preload="auto"
                                 />
                             </div>
-                            <div className="flex justify-start items-center gap-4 mt-10">
-                                <div className={`${step.color} font-serif italic font-bold text-[56px] leading-none mb-3`}>
+                            <div className="flex justify-start items-center gap-4 mt-4">
+                                <div className={`${step.color} font-serif italic font-bold text-[56px] leading-none`}>
                                     {step.number}
                                 </div>
                                 <div>
@@ -71,7 +109,7 @@ export function StepsSection() {
                         alt=""
                         width={300}
                         height={300}
-                        className="w-[350px] h-[]"
+                        className="w-[350px]"
                     />
                 </div>
             </div>
