@@ -1,3 +1,5 @@
+'use client'
+
 import { ArrowRight } from "lucide-react"
 import { GoogleButton } from "../ui/GoogleButton"
 import Image from "next/image"
