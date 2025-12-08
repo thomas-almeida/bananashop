@@ -84,8 +84,6 @@ export function HeroSection() {
                             className="w-[350px] rounded-xl border-8 border-slate-950 shadow-lg"
                         />
                     </div>
-                    <hr className="border-4 h-[30px] absolute top-16 right-2 rounded-full" />
-                    <hr className="border-4 h-[80px] absolute top-30 right-2 rounded-full" />
                 </div>
             </div>
         </section>

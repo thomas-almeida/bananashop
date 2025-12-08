@@ -105,7 +105,7 @@ export function StepsSection() {
                     </h2>
 
                     <Image
-                        src={"/images/screenshot.png"}
+                        src={"/images/dashboard.png"}
                         alt=""
                         width={300}
                         height={300}
