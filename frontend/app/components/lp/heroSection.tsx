@@ -39,7 +39,7 @@ export function HeroSection() {
     return (
         <section className="px-5 pt-6 pb-0">
             {/* Logo */}
-            <div className="flex flex-col justify-center items-center mt-10 mb-5">
+            <div className="flex flex-col justify-center items-center mb-5">
                 <Image
                     src={"/logo.png"}
                     width={50}
@@ -52,7 +52,7 @@ export function HeroSection() {
 
             {/* Hero Content */}
             <div className="flex flex-col justify-center">
-                <h1 className="font-bold italic text-[34px] leading-7 tracking-tighter mb-6 text-black text-center px-8 my-6">
+                <h1 className="font-bold italic text-[41px] leading-8 tracking-tighter mb-6 text-black text-center my-6">
                     Transforme seu Instagram em uma loja completa
                 </h1>
 
