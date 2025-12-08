@@ -29,7 +29,7 @@ export const createTransaction = async (req, res) => {
             payload,
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.ABACATEPAY_TOKEN_DEV}`
+                    Authorization: `Bearer ${process.env.ABACATEPAY_TOKEN_PROD}`
                 }
             }
         );
