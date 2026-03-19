@@ -30,12 +30,15 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, storeId, price, inStorage }: CheckoutModalProps) {
-    
+
     const [quantity, setQuantity] = useState(1);
     const [isCepLoading, setIsCepLoading] = useState(false);
 
-const methods = useForm<CustomerCheckoutFormData>({
+    const methods = useForm<CustomerCheckoutFormData>({
         resolver: zodResolver(customerCheckoutSchema),
+        defaultValues: {
+            shipOption: 'Uber Bag'
+        }
     });
 
     const {
@@ -61,6 +64,7 @@ const methods = useForm<CustomerCheckoutFormData>({
                     city: data.city,
                     state: data.state,
                     postalCode: data.zipCode,
+                    shipOption: data.shipOption
                 },
             };
 
@@ -89,22 +93,22 @@ const methods = useForm<CustomerCheckoutFormData>({
 
     // Observa mudanças no CEP e faz a busca quando tiver 8 dígitos
     const cep = watch('zipCode');
-    
+
     useEffect(() => {
         const fetchCep = async () => {
             // Remove formatação e verifica se tem 8 dígitos
             const cleanedCep = cep?.replace(/\D/g, '') || '';
             if (cleanedCep.length !== 8) return;
-            
+
             try {
                 setIsCepLoading(true);
                 const cepData = await searchCep(cleanedCep);
-                
+
                 // Preenche os campos automaticamente
                 setValue('state', cepData.uf);
                 setValue('city', cepData.localidade);
                 setValue('address', cepData.logradouro);
-                
+
                 // Foca no campo de número após preencher o endereço
                 document.getElementById('addressNumber')?.focus();
             } catch (error) {
@@ -205,6 +209,41 @@ const methods = useForm<CustomerCheckoutFormData>({
                                     </button>
                                 </div>
                             </div>
+
+                            <div className="mb-4">
+                                <label className="block font-medium text-gray-700 mb-2">Forma de Entrega</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <label className={`flex items-center gap-3 p-4 border rounded cursor-pointer transition-all ${watch('shipOption') === 'Uber Bag' ? 'border-green-500 bg-green-50/50 ring-1 ring-green-500' : 'border-gray-200 hover:border-green-200 hover:bg-gray-50'}`}>
+                                        <input
+                                            type="radio"
+                                            value="Uber Bag"
+                                            {...register("shipOption")}
+                                            className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
+                                        />
+                                        <span className={`text-sm font-semibold ${watch('shipOption') === 'Uber Bag' ? 'text-green-700' : 'text-gray-700'}`}>
+                                            Uber Bag
+                                        </span>
+                                    </label>
+                                    <label className={`flex items-center gap-3 p-4 border rounded cursor-pointer transition-all ${watch('shipOption') === 'Metrô ou CPTM' ? 'border-green-500 bg-green-50/50 ring-1 ring-green-500' : 'border-gray-200 hover:border-green-200 hover:bg-gray-50'}`}>
+                                        <input
+                                            type="radio"
+                                            value="Metrô ou CPTM"
+                                            {...register("shipOption")}
+                                            className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
+                                        />
+                                        <span className={`text-sm font-semibold ${watch('shipOption') === 'Metrô ou CPTM' ? 'text-green-700' : 'text-gray-700'}`}>
+                                            Metrô ou CPTM
+                                        </span>
+                                    </label>
+                                </div>
+                                {errors.shipOption && (
+                                    <p className="mt-1.5 text-xs font-medium text-red-500 flex items-center gap-1">
+                                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                                        {errors.shipOption.message?.toString()}
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="relative">
                                 <Input
                                     placeholder="CEP"
@@ -214,7 +253,7 @@ const methods = useForm<CustomerCheckoutFormData>({
                                         onChange: (e) => {
                                             // Remove tudo que não for número
                                             const value = e.target.value.replace(/\D/g, '');
-                                            
+
                                             // Aplica a máscara (XXXXX-XXX) apenas visual
                                             let displayValue = value;
                                             if (value.length > 5) {
@@ -222,10 +261,10 @@ const methods = useForm<CustomerCheckoutFormData>({
                                             } else if (value.length > 0) {
                                                 displayValue = value;
                                             }
-                                            
+
                                             // Atualiza o valor exibido
                                             e.target.value = displayValue;
-                                            
+
                                             // Retorna o valor sem formatação para o formulário
                                             return value;
                                         },
@@ -236,7 +275,7 @@ const methods = useForm<CustomerCheckoutFormData>({
                                 />
                                 {isCepLoading && (
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
                                     </div>
                                 )}
                             </div>

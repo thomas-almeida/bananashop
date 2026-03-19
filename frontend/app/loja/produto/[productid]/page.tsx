@@ -203,6 +203,33 @@ export default function ProductPage() {
                             </div>
 
                             <div className="mt-8 w-full max-w-2xl">
+                                <h3 className="text-xl font-bold">Formas de Entrega</h3>
+                                <p className="mb-4">Selecione uma das seguintes ao prosseguir para finalizar a compra</p>
+                                <div className="p-2 px-0 flex flex-col gap-2">
+                                    <div className="flex justify-start items-center gap-2 p-1">
+                                        <img
+                                            src={"/uber.png"}
+                                            className="w-16 h-16 rounded-lg shadow"
+                                        />
+                                        <div>
+                                            <h3 className="font-bold text-xl">Uber Bag</h3>
+                                            <p>Seu produto será entregue via Uber até a sua residência</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-start items-center gap-2 p-1">
+                                        <img
+                                            src={"/metro.png"}
+                                            className="w-16 h-16 rounded-lg shadow"
+                                        />
+                                        <div>
+                                            <h3 className="font-bold text-xl">Metrô ou CPTM</h3>
+                                            <p>Combine de se encontrar com o vendedor em uma das estações</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 w-full max-w-2xl">
                                 <h3 className="text-xl font-bold mb-4">Dúvidas de como comprar:</h3>
                                 <div className="space-y-2">
                                     {[
@@ -261,6 +288,12 @@ export default function ProductPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            <img
+                                src="/secure-buy.png"
+                                alt=""
+                                className="pt-8"
+                            />
 
                         </div>
                     </div>

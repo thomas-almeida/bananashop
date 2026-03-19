@@ -86,27 +86,30 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
         if (!session?.user?.id) return;
 
         setIsLoading(true);
-
-        let imageUrl = ''
-
-        if (logo) {
-            const response = await fetch(logo);
-            const blob = await response.blob();
-            const fileToUpload = new File([blob], 'store-logo.jpg', { type: 'image/jpeg' });
-            const uploadResponse = await uploadImage(fileToUpload);
-            imageUrl = uploadResponse.imageUrl;
-        }
-
         try {
-            await updateStore(user?.store, {
+            let imageUrl = storeData?.image || '';
+
+            // Só faz upload se a logo for uma nova imagem (base64)
+            if (logo && logo.startsWith('data:image')) {
+                const response = await fetch(logo);
+                const blob = await response.blob();
+                const fileToUpload = new File([blob], 'store-logo.jpg', { type: 'image/jpeg' });
+                const uploadResponse = await uploadImage(fileToUpload);
+                imageUrl = uploadResponse.imageUrl;
+            } else if (!logo) {
+                imageUrl = '';
+            }
+
+            await updateStore(user?.store || storeData?._id, {
                 name: data.storeName,
                 description: data.description,
                 igNickname: data.instagram,
                 whatsappNumber: data.whatsapp,
                 image: imageUrl,
             });
+            
             toast.success('Dados da loja atualizados com sucesso!');
-            alert("dados atualizados com sucesso!")
+            // Opcional: recarregar os dados ou atualizar o estado local
         } catch (error) {
             console.error('Error updating store:', error);
             toast.error('Erro ao atualizar dados da loja');
@@ -156,6 +159,9 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                                 <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP (máx. 2MB)</p>
                             </div>
                         )}
+                        {errors.logo && (
+                            <p className="text-red-500 text-sm mt-1">{errors.logo.message?.toString()}</p>
+                        )}
                     </div>
 
                     <Input
@@ -163,6 +169,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                         type="text"
                         placeholder="Nome da sua loja"
                         {...register('storeName')}
+                        error={errors.storeName}
                     />
 
                     <Input
@@ -170,6 +177,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                         type="text"
                         placeholder="@sualoja"
                         {...register('instagram')}
+                        error={errors.instagram}
                     />
 
                     <Input
@@ -177,6 +185,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                         type="text"
                         placeholder="(00) 00000-0000"
                         {...register('whatsapp')}
+                        error={errors.whatsapp}
                     />
 
                     <div className="md:col-span-2">
@@ -185,6 +194,7 @@ export default function StoreSettings({ storeData, user }: { storeData: any, use
                             type="textarea"
                             placeholder="Conte um pouco sobre sua loja..."
                             {...register('description')}
+                            error={errors.description}
                         />
                     </div>
                 </div>
