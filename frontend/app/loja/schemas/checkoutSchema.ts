@@ -9,6 +9,7 @@ export const customerCheckoutSchema = z.object({
     city: z.string().min(1, "Cidade é obrigatória"),
     state: z.string().min(1, "Estado é obrigatório"),
     zipCode: z.string().min(1, "CEP é obrigatório"),
+    shipOption: z.string().min(1, "Selecione"),
 });
 
 export type CustomerCheckoutFormData = z.infer<typeof customerCheckoutSchema>;
