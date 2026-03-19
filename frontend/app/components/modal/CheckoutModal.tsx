@@ -126,11 +126,11 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess, productId, s
 
     return (
         <div
-            className="fixed inset-0 bg-black/45 flex justify-center items-end z-50 transition-opacity duration-300"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-end sm:items-center z-50 transition-all duration-300 p-0 sm:p-4"
             onClick={handleBackdropClick}
         >
             <div
-                className="bg-white w-full max-w-2xl max-h-[85%] rounded-t-2xl p-6 animate-slide-up overflow-y-auto"
+                className="bg-white w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl p-6 lg:p-8 animate-slide-up sm:animate-fade-in overflow-y-auto shadow-2xl"
                 onClick={handleModalClick}
             >
                 <div className="flex justify-between items-center mb-6">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getProductById } from "@/app/service/productService";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, Share2, Check, Copy } from "lucide-react";
@@ -22,6 +22,8 @@ export default function ProductDetail({ productid, initialProduct }: { productid
     const [isCopied, setIsCopied] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [isPixModalOpen, setIsPixModalOpen] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const sliderRef = useRef<Slider>(null);
     const [pixData, setPixData] = useState({
         qrCode: "",
         code: "",
@@ -29,6 +31,11 @@ export default function ProductDetail({ productid, initialProduct }: { productid
         expiresIn: 0,
         transactionId: ""
     });
+
+    const goToSlide = (index: number) => {
+        sliderRef.current?.slickGoTo(index);
+        setCurrentSlide(index);
+    };
 
     const handleCheckoutSuccess = async (transactionData: {
         brcode: string;
@@ -91,14 +98,14 @@ export default function ProductDetail({ productid, initialProduct }: { productid
         const fetchData = async () => {
             if (initialProduct && !storeInfo) {
                 try {
-                   if (initialProduct.store) {
-                       const storeResponse = await getStoreById(initialProduct.store);
-                       setStoreInfo(storeResponse?.data);
-                   }
+                    if (initialProduct.store) {
+                        const storeResponse = await getStoreById(initialProduct.store);
+                        setStoreInfo(storeResponse?.data);
+                    }
                 } catch (e) { console.error(e); }
                 return;
             }
-            
+
             setLoading(true);
             try {
                 // Primeiro busca o produto
@@ -130,116 +137,139 @@ export default function ProductDetail({ productid, initialProduct }: { productid
     }
 
     return (
-        <div>
+        <div className="bg-white min-h-screen">
             {product ? (
                 <>
                     <div className="flex justify-center items-start">
-                        <div className="flex flex-col justify-start items-start w-[90%] py-6 text-left">
-                            <div className="w-full max-w-2xl mx-auto mb-4 relative">
-                                <div>
-                                    <Link
-                                        href={`/loja/${storeInfo?.normalizedName}`}
-                                        className="py-4 text-center flex justify-center gap-2 items-center"
-                                    >
-                                        {
-                                            storeInfo && (
-                                                <>
-                                                    <Image
-                                                        src={storeInfo?.image || '/logo.png'}
-                                                        alt={storeInfo?.name}
-                                                        width={50}
-                                                        height={50}
-                                                        className="rounded-full border border-slate-200 shadow"
-                                                    />
-                                                    <h2 className="text-lg font-medium">{storeInfo?.name}</h2>
-
-                                                </>
-                                            )
-                                        }
-                                    </Link>
-                                </div>
-                                <Slider
-                                    dots={true}
-                                    infinite={true}
-                                    speed={500}
-                                    slidesToShow={1}
-                                    slidesToScroll={1}
-                                    autoplay={true}
-                                    autoplaySpeed={5000}
+                        <div className="flex flex-col justify-start items-start w-[90%] py-6 text-left max-w-7xl mx-auto">
+                            <div className="w-full mb-4">
+                                <Link
+                                    href={`/loja/${storeInfo?.normalizedName}`}
+                                    className="py-4 text-center flex justify-center lg:justify-start gap-2 items-center"
                                 >
-                                    {product?.images?.map((image: string, index: number) => (
-                                        <div key={index} className="relative h-96">
+                                    {storeInfo && (
+                                        <>
                                             <Image
-                                                src={image}
-                                                alt={`${product?.name} - Imagem ${index + 1}`}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                                priority={index === 0}
-                                                className="rounded-xl shadow-lg border border-slate-300"
+                                                src={storeInfo?.image || '/logo.png'}
+                                                alt={storeInfo?.name}
+                                                width={50}
+                                                height={50}
+                                                className="rounded-full border border-slate-200 shadow"
                                             />
-                                        </div>
-                                    ))}
-                                </Slider>
-                            </div>
-                            <b className={`text-${product?.inStorage > 0 ? "green-500" : "red-500"}`}>{product?.inStorage > 0 ? "Disponível" : "Esgotado"}</b>
-                            <h1 className="text-3xl font-bold uppercase py-2">{product?.name}</h1>
-                            <p className="text-lg pb-2">{product?.description}</p>
-                            <h2 className="text-4xl py-3 font-bold">{product?.price?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h2>
-                            {
-                                product?.brand !== "" && (
-                                    <p className="text-lg pb-1">Marca: <b className="text-neutral-700">{product?.brand}</b></p>
-                                )
-                            }
-                            <p className="font-semibold text-lg text-neutral-800 pb-4">{product?.inStorage} Disponíveis</p>
-
-                            <div className="flex flex-col gap-2 w-full">
-                                <Button
-                                    text={product?.inStorage === 0 ? "Esgotado" : "Comprar Agora no PIX"}
-                                    color="primary"
-                                    onClick={() => setIsCheckoutOpen(true)}
-                                    icon={product?.inStorage > 0 && <Image src={"/pix.png"} width={20} height={20} alt="pix" />}
-                                    className="w-full"
-                                    disabled={product?.inStorage === 0}
-                                />
-                                <Button
-                                    text={isCopied ? "Link copiado!" : "Compartilhar"}
-                                    color="secondary"
-                                    onClick={handleShare}
-                                    icon={<Share2 size={18} className="mr-2" />}
-                                    className="w-full flex items-center justify-center"
-                                />
+                                            <h2 className="text-lg font-medium">{storeInfo?.name}</h2>
+                                        </>
+                                    )}
+                                </Link>
                             </div>
 
-                            <div className="mt-8 w-full max-w-2xl">
-                                <h3 className="text-xl font-bold">Formas de Entrega</h3>
-                                <p className="mb-4">Selecione uma das seguintes ao prosseguir para finalizar a compra</p>
-                                <div className="p-2 px-0 flex flex-col gap-2">
-                                    <div className="flex justify-start items-center gap-2 p-1">
-                                        <img
-                                            src={"/uber.png"}
-                                            className="w-16 h-16 rounded-lg shadow"
-                                        />
-                                        <div>
-                                            <h3 className="font-bold text-xl">Uber Bag</h3>
-                                            <p>Seu produto será entregue via Uber até a sua residência</p>
-                                        </div>
+                            <div className="lg:grid lg:grid-cols-2 lg:gap-12 w-full items-start">
+                                {/* Coluna Esquerda: Slider (Original restaurado) */}
+                                <div className="w-full mb-4 relative">
+                                    <Slider
+                                        ref={sliderRef}
+                                        dots={true}
+                                        dotsClass="slick-dots custom-dots lg:hidden"
+                                        infinite={true}
+                                        speed={500}
+                                        slidesToShow={1}
+                                        slidesToScroll={1}
+                                        autoplay={true}
+                                        autoplaySpeed={5000}
+                                        beforeChange={(_, next) => setCurrentSlide(next)}
+                                    >
+                                        {product?.images?.map((image: string, index: number) => (
+                                            <div key={index} className="relative h-96 lg:h-[600px]">
+                                                <Image
+                                                    src={image}
+                                                    alt={`${product?.name} - Imagem ${index + 1}`}
+                                                    fill
+                                                    style={{ objectFit: 'cover' }}
+                                                    priority={index === 0}
+                                                    className="rounded-xl shadow-lg border border-slate-300"
+                                                />
+                                            </div>
+                                        ))}
+                                    </Slider>
+
+                                    {/* Mini Thumbnails (Apenas no Desktop) */}
+                                    <div className="hidden lg:flex gap-4 mt-6 overflow-x-auto pb-2 scrollbar-hide">
+                                        {product?.images?.map((image: string, index: number) => (
+                                            <div
+                                                key={index}
+                                                className={`relative w-24 h-24 flex-shrink-0 cursor-pointer rounded-lg border-2 transition-all ${currentSlide === index ? 'border-blue-500 scale-105 shadow-md' : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-400'
+                                                    }`}
+                                                onClick={() => goToSlide(index)}
+                                            >
+                                                <Image
+                                                    src={image}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    fill
+                                                    className="object-cover rounded-md"
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className="flex justify-start items-center gap-2 p-1">
-                                        <img
-                                            src={"/metro.png"}
-                                            className="w-16 h-16 rounded-lg shadow"
+                                </div>
+
+                                {/* Coluna Direita: Conteúdo */}
+                                <div className="flex flex-col justify-start items-start text-left lg:pt-4">
+                                    <b className={`text-${product?.inStorage > 0 ? "green-500" : "red-500"}`}>
+                                        {product?.inStorage > 0 ? "Disponível" : "Esgotado"}
+                                    </b>
+                                    <h1 className="text-3xl font-bold uppercase py-2 leading-tight">{product?.name}</h1>
+                                    <p className="text-lg pb-2 text-gray-700">{product?.description}</p>
+                                    <h2 className="text-4xl py-3 font-bold">
+                                        {product?.price?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </h2>
+                                    {product?.brand !== "" && (
+                                        <p className="text-lg pb-1">Marca: <b className="text-neutral-700">{product?.brand}</b></p>
+                                    )}
+                                    <p className="font-semibold text-lg text-neutral-800 pb-4">{product?.inStorage} Disponíveis</p>
+
+                                    <div className="flex flex-col gap-2 w-full max-w-md">
+                                        <Button
+                                            text={product?.inStorage === 0 ? "Esgotado" : "Comprar Agora no PIX"}
+                                            color="primary"
+                                            onClick={() => setIsCheckoutOpen(true)}
+                                            icon={product?.inStorage > 0 && <Image src={"/pix.png"} width={20} height={20} alt="pix" />}
+                                            className="w-full"
+                                            disabled={product?.inStorage === 0}
                                         />
-                                        <div>
-                                            <h3 className="font-bold text-xl">Metrô ou CPTM</h3>
-                                            <p>Combine de se encontrar com o vendedor em uma das estações</p>
+                                        <Button
+                                            text={isCopied ? "Link copiado!" : "Compartilhar"}
+                                            color="secondary"
+                                            onClick={handleShare}
+                                            icon={<Share2 size={18} className="mr-2" />}
+                                            className="w-full flex items-center justify-center"
+                                        />
+                                    </div>
+
+                                    <div className="mt-8 w-full">
+                                        <h3 className="text-xl font-bold">Formas de Entrega</h3>
+                                        <p className="mb-4 text-gray-600">Selecione uma das seguintes ao prosseguir para finalizar a compra</p>
+                                        <div className="p-2 px-0 flex flex-col gap-4">
+                                            <div className="flex justify-start items-center gap-3 p-1">
+                                                <img src={"/uber.png"} className="w-16 h-16 rounded-lg shadow" />
+                                                <div>
+                                                    <h3 className="font-bold text-xl">Uber Bag</h3>
+                                                    <p className="text-sm text-gray-600">Seu produto será entregue via Uber até a sua residência</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-start items-center gap-3 p-1">
+                                                <img src={"/metro.png"} className="w-16 h-16 rounded-lg shadow" />
+                                                <div>
+                                                    <h3 className="font-bold text-xl">Metrô ou CPTM</h3>
+                                                    <p className="text-sm text-gray-600">Combine de se encontrar com o vendedor em uma das estações</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 w-full max-w-2xl">
-                                <h3 className="text-xl font-bold mb-4">Dúvidas de como comprar:</h3>
+                            <div className="mt-8 w-full max-w-2xl lg:max-w-none lg:grid lg:grid-cols-2 lg:gap-8">
                                 <div className="space-y-2">
+                                    <h3 className="text-xl font-bold mb-4">Dúvidas de como comprar:</h3>
                                     {[
                                         {
                                             question: "Como vou receber minha entrega?",
@@ -247,8 +277,26 @@ export default function ProductDetail({ productid, initialProduct }: { productid
                                         },
                                         {
                                             question: "O que acontece após o pagamento? estou protegido?",
-                                            answer: "Após a confirmação do pagamento,vcoê e a loja recebem a confirmação, a loja entrará em contato com você para ajustar a entrega do produto. não se preocupe, caso algo dê errado seu reembolso poderá ser realizado normalmente"
-                                        },
+                                            answer: "Após a confirmação do pagamento, você e a loja recebem a confirmação, a loja entrará em contato com você para ajustar a entrega do produto. não se preocupe, caso algo dê errado seu reembolso poderá ser realizado normalmente"
+                                        }
+                                    ].map((item, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                                            <button
+                                                className="w-full px-4 py-3 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                                                onClick={() => toggleAccordion(index)}
+                                            >
+                                                <span className="font-medium text-gray-900">{item.question}</span>
+                                                {openAccordion === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                            </button>
+                                            <div className={`px-4 overflow-hidden transition-all duration-300 ${openAccordion === index ? 'max-h-96 py-4' : 'max-h-0'}`}>
+                                                <div className="text-gray-600 text-sm">{item.answer}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="space-y-2 mt-2 lg:mt-11">
+                                    {[
                                         {
                                             question: "Existe garantia?",
                                             answer: "Sim, existe garantia de 7 dias, caso o produto não atenda às expectativas ou não seja entregue, você poderá solicitar o reembolso normalmente."
@@ -259,50 +307,34 @@ export default function ProductDetail({ productid, initialProduct }: { productid
                                                 <>
                                                     Caso precise de ajuda ou tenha mais perguntas você pode entrar em contato direto com este perfil:
                                                     <Link href={`https://api.whatsapp.com/send?phone=55${storeInfo?.whatsappNumber}&text=Olá%2C%20vi%20sua%20loja%20no%20bananashop!%20🍌`} className="block mt-2">
-                                                        <Button
-                                                            text="Falar com a loja"
-                                                            color="secondary"
-                                                            className="my-2"
-                                                        />
+                                                        <Button text="Falar com a loja" color="secondary" className="my-2" />
                                                     </Link>
                                                 </>
                                             )
                                         }
-                                    ].map((item, index) => (
-                                        <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <button
-                                                className="w-full px-4 py-3 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
-                                                onClick={() => toggleAccordion(index)}
-                                                aria-expanded={openAccordion === index}
-                                                aria-controls={`accordion-content-${index}`}
-                                            >
-                                                <span className="font-medium text-gray-900">{item.question}</span>
-                                                {openAccordion === index ? (
-                                                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                                                ) : (
-                                                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                                                )}
-                                            </button>
-                                            <div
-                                                id={`accordion-content-${index}`}
-                                                className={`px-4 overflow-hidden transition-all duration-300 ${openAccordion === index ? 'max-h-96 py-4' : 'max-h-0'}`}
-                                                aria-hidden={openAccordion !== index}
-                                            >
-                                                <div className="text-gray-600 pb-2">
-                                                    {item.answer}
+                                    ].map((item, index) => {
+                                        const actualIndex = index + 2;
+                                        return (
+                                            <div key={actualIndex} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                                                <button
+                                                    className="w-full px-4 py-3 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                                                    onClick={() => toggleAccordion(actualIndex)}
+                                                >
+                                                    <span className="font-medium text-gray-900">{item.question}</span>
+                                                    {openAccordion === actualIndex ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                                </button>
+                                                <div className={`px-4 overflow-hidden transition-all duration-300 ${openAccordion === actualIndex ? 'max-h-96 py-4' : 'max-h-0'}`}>
+                                                    <div className="text-gray-600 text-sm">{item.answer}</div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 
-                            <img
-                                src="/secure-buy.png"
-                                alt=""
-                                className="pt-8"
-                            />
-
+                            <div className="flex justify-center items-center w-full">
+                                <img src="/secure-buy.png" alt="" className="pt-8 mx-auto md:w-150 lg:mx-0" />
+                            </div>
                         </div>
                     </div>
                     <Footer />
@@ -329,10 +361,13 @@ export default function ProductDetail({ productid, initialProduct }: { productid
                     />
                 </>
             ) : (
-                <p>Produto não encontrado</p>
-            )
-            }
-
-        </div >
+                <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                    <p className="text-xl font-bold text-gray-400">Produto não encontrado</p>
+                    <Link href="/">
+                        <Button text="Voltar para o início" color="secondary" />
+                    </Link>
+                </div>
+            )}
+        </div>
     )
 }
