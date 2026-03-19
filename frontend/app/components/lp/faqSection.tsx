@@ -14,12 +14,17 @@ export function FaqSection() {
 
 
     return (
-        <section className="px-5 py-12 bg-white">
-            <h2 className="font-bold italic text-[34px] leading-7 tracking-tighter mb-6 text-black text-center px-8 my-6">
-                Ainda pensando se o Bananashop é pra você?
-            </h2>
-            <p className="text-[13px] leading-4 font-medium text-center px-10 mb-4">Separamos as maiores dúvidas que nossos clientes tiveram</p>
-            <div className="space-y-2">
+        <section className="px-5 py-16 lg:py-24 bg-white max-w-4xl mx-auto">
+            <div className="text-center mb-12 lg:mb-16">
+                <h2 className="font-black italic text-[34px] lg:text-[56px] leading-tight tracking-tighter mb-6 text-black">
+                    Ainda pensando se o Bananashop é pra você?
+                </h2>
+                <p className="text-[15px] lg:text-[19px] font-medium text-gray-600 px-10">
+                    Separamos as maiores dúvidas que nossos clientes tiveram para te ajudar a decidir.
+                </p>
+            </div>
+
+            <div className="space-y-4">
                 {[
                     {
                         question: "O que é o Bananashop? é pra mim?",
@@ -45,26 +50,22 @@ export function FaqSection() {
                         answer: "Sim! Temos suporte dedicado para ajudar você em todas as etapas do processo.",
                     },
                 ].map((item, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div key={index} className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                         <button
-                            className="w-full px-4 py-3 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                            className="w-full px-6 py-5 text-left flex justify-between items-center bg-gray-50/50 hover:bg-gray-100 transition-colors"
                             onClick={() => toggleAccordion(index)}
-                            aria-expanded={openAccordion === index}
-                            aria-controls={`accordion-content-${index}`}
                         >
-                            <span className="font-medium text-gray-900">{item.question}</span>
+                            <span className="font-bold text-lg lg:text-xl text-gray-900 leading-tight">{item.question}</span>
                             {openAccordion === index ? (
-                                <ChevronUp className="h-5 w-5 text-gray-500" />
+                                <ChevronUp className="h-6 w-6 text-gray-500" />
                             ) : (
-                                <ChevronDown className="h-5 w-5 text-gray-500" />
+                                <ChevronDown className="h-6 w-6 text-gray-500" />
                             )}
                         </button>
                         <div
-                            id={`accordion-content-${index}`}
-                            className={`px-4 overflow-hidden transition-all duration-300 ${openAccordion === index ? 'max-h-96 py-4' : 'max-h-0'}`}
-                            aria-hidden={openAccordion !== index}
+                            className={`px-6 overflow-hidden transition-all duration-300 ${openAccordion === index ? 'max-h-96 py-6 border-t border-gray-100' : 'max-h-0'}`}
                         >
-                            <div className="text-gray-600 pb-2">
+                            <div className="text-gray-600 text-base lg:text-lg leading-relaxed">
                                 {item.answer}
                             </div>
                         </div>
